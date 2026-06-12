@@ -1,94 +1,192 @@
-### **注意本库只能作为学习用途, 造成的任何问题与本库开发者无关, 如侵犯到你的权益，请联系删除。**
-### **注意本库只能作为学习用途, 造成的任何问题与本库开发者无关, 如侵犯到你的权益，请联系删除。**
-### **注意本库只能作为学习用途, 造成的任何问题与本库开发者无关, 如侵犯到你的权益，请联系删除。**
+# 寻道大千 自动化脚本
 
-# 注意事项！！！
-> 本文来自于[https://github.com/gyn7561/xddq-assistant](https://github.com/gyn7561/xddq-assistant) <br/>
-> 本文仅用于学习，针对此脚本获取到了收益， `你妈死了` <br/>
-> 原始版本更新于 `2025年3月27日` <br/>
-> 作者：`wan-yoba` <br/>
-> 二次开发更新于 `2026年5月7日` <br/>
+> 仅供技术学习交流使用  
+> 基于 [xddq-assistant](https://github.com/gyn7561/xddq-assistant) 二次开发
 
-## 免责声明
+## 环境要求
 
-本仓库仅供技术学习交流使用，如有下载相关文件，请在学习后24小时内删除相关内容。
+- Node.js >= 18
+- npm 或 yarn
 
-切勿在 tb/pdd 等商城的非法渠道付费此软件。
+## 安装
 
-如将本仓库教程/文件用于获利，那么：你妈死了。
-
-请勿将本项目内容用于非法用途，使用者在使用时即视为对行为可能产生的任何不良后果负责。
-
-由于传播、利用此工具所提供的信息而造成的任何直接或者间接的后果及损失，均由使用者本人负责，作者不为此承担任何责任。
-
-## 新功能 (2026-05-07)
-
-### 自动连接游戏
-启动脚本后自动检测 `account.json` 中的账号密码，自动登录并连接游戏服务器。无需再手动点击"启动"按钮。
-
-## 分支
-* 分支 `main` 为 单账号的服务端
-* 分支 `develop_multi_user` 为 多账号的服务端初步实现，但在一个服务维护多个`socket`工作量巨大，未完成。建议使用 `pm2` 管理多个服务。
-* [Web](https://github.com/wan-yoba/xddq-web) `main`分支为 网页版的前端
-
-## 网页使用方法
-
-* 获取仓库[Web](https://github.com/wan-yoba/xddq-web)
-
-### dockerUi 部署
-```
-// 切入到项目目录 即 `Dockerfile` 目录下
-// 构建镜像
-docker build -t xddq-ui-image .
-// 运行容器
-docker run --name=xddq-ui -dp 8083:80 --restart=always -e TZ=Asia/Shanghai xddq-ui-image
+```bash
+git clone https://github.com/zhang972808/x-d-d-q.git
+cd x-d-d-q
+npm install
 ```
 
-### docker服务端 部署
+## 使用方式
 
-* docker 容器，windows 电脑需要安装 `docker-desktop`
-* docker 命令，需要切到项目主目录，执行以下命令
-```
-// 创建镜像
-docker build -t xddq-image .
+### 方式一：管理服务器（推荐，支持多账号）
 
-// 运行容器
-docker run --name=xddq -dp 8082:8082 --restart=always -e TZ=Asia/Shanghai xddq-image
-
-那么此时访问你的IP 例如 1.1.1.1:8082 就能请求到接口
-
-// 构建 ui 请参考上述
-
-此时访问 你的IP，如 1.1.1.1:8083 将能看到界面
-
-如果是本机，可以不用部署ui界面，直接点击 index.html 即可
-
-```
-* 记得更改 `UI` 中的 `baseUrl`，将 localhost 改为对应的ip地址，这是在服务器上面的操作
-* 登陆界面如果有设置 `token` 在 `account.js` 中，将 `loginToken` 的值设定为自己想要的即可，如果不设置将不验证
-
-### windows 应用
-* 请下载 nodejs 的windows组件，切入目录，使用以下命令 `node app.js`
-* 指定配置文件：`node app.js "data/账号名.json"`
-* 指定端口（多账号）：`node app.js "data/账号名.json" 8083`
-* 开启 debug 日志：`set LOGLEVEL=debug && node app.js "data/账号名.json"`
-* 运行后自动登录游戏，无需额外操作
-
-### 多账号运行
-使用不同端口启动多个实例：
-```
-node app.js "data/子号1.json" 8082
-node app.js "data/子号2.json" 8083
-node app.js "data/子号3.json" 8084
+```bash
+node server.js
 ```
 
-### windows 打包可执行文件
-* TODO // 尚未实现
+启动管理服务器（默认端口 8080），提供 Web 管理界面：
+- 浏览器打开 `http://服务器IP:8080`
+- 在管理界面添加游戏账号并启动
+- 支持多账号同时运行
 
-## 效果图例
+### 方式二：单账号直接运行
 
-### 登陆界面
-![image](https://github.com/user-attachments/assets/14bfa4b5-abcd-4c63-a26f-f2f9f570f781)
+```bash
+node app.js "data/账号文件.json"
+```
 
-### 主界面
-![image](https://github.com/user-attachments/assets/3614f840-5748-4eee-88e3-798c3b768a5c)
+或使用默认配置：
+```bash
+node app.js
+```
+
+### 方式三：PM2 部署（服务器推荐）
+
+```bash
+# 安装 PM2
+npm install -g pm2
+
+# 启动管理服务器
+pm2 start server.js --name server
+
+# 查看运行状态
+pm2 list
+
+# 查看日志
+pm2 logs server --lines 100 --nostream
+
+# 重启
+pm2 restart server
+```
+
+## 功能说明
+
+### 日常任务（自动执行）
+
+| 功能 | 说明 |
+|------|------|
+| 砍树 | 自动砍树，支持严格模式/妖力模式 |
+| 灵脉 | 自动灵脉筛选装备 |
+| 异兽入侵 | 每日 5 次自动挑战 |
+| 挑战妖王 | 自动挑战 + 领取广告奖励 |
+| 星宿试炼 | 自动挑战星宿 |
+| 宗门 | 自动训练→毕业→招人→锤炼 |
+| 道途 | 自动挑战 Boss 20 次→扫荡→修行 |
+| 群英榜 | 每日自动打榜 |
+| 镇妖塔 | 一键选择 buff + 自动挑战 |
+| 征战诸天 | 自动挑战 5 场 |
+| 镇魔 | 自动参与镇魔活动 |
+| 斗法 | 券数量超过阈值自动打 |
+| 福地 | 自动收获、派遣 |
+| 妖盟寻宝 | 自动挖宝箱 |
+| 妖盟广告 | 自动领取 |
+| 活动 | 自动领取免费礼包和任务奖励 |
+| 青蛙管理 | 自动领取广告奖励 |
+| 灵兽 | 自动刷新 + 抓捕 |
+| 邮件 | 自动领取奖励 |
+| 仙树 | 自动升级 + 净瓶水加速 |
+| 自动买桃 | 群英榜商店自动购买 |
+
+### 挑战（需配置）
+
+| 功能 | 说明 |
+|------|------|
+| 冒险推图 | 每天 6:00-8:00 北京时间窗口 |
+| 镇妖塔 | 同上时间窗口 |
+| 真火秘境 | 同上时间窗口 |
+
+## 配置说明
+
+### 开关配置（`account.json` 的 `switch` 字段）
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `chopTree` | bool | false | 自动砍树 |
+| `talent` | bool | false | 自动灵脉 |
+| `invade` | bool | false | 异兽入侵 |
+| `wildBoss` | bool | false | 挑战妖王 |
+| `starTrial` | bool | false | 星宿试炼 |
+| `pupil` | bool | false | 宗门 |
+| `career` | bool | false | 道途 |
+| `herorank` | bool | false | 群英榜 |
+| `challenge` | number | 0 | 冒险/塔/真火次数(0=不挑战) |
+| `skywar` | bool | false | 征战诸天 |
+| `townDemon` | bool | false | 镇魔 |
+| `ticket` | number | 0 | 斗法券触发数量 |
+| `activity` | bool | false | 自动活动 |
+| `gatherEnergy` | bool | false | 聚灵阵 |
+| `homeland` | bool | false | 福地 |
+| `challengeSuccessReset` | bool | false | 挑战成功重置次数 |
+
+## 目录结构
+
+```
+├── app.js                  # 游戏脚本入口（单账号）
+├── server.js               # 管理服务器入口（多账号）
+├── account.json            # 单账号配置
+├── data/                   # 多账号配置目录
+├── src/
+│   ├── game/
+│   │   ├── mgr/            # 功能管理器
+│   │   │   ├── ChapterMgr.js        # 冒险/关卡
+│   │   │   ├── TowerMgr.js          # 镇妖塔
+│   │   │   ├── SecretTowerMgr.js    # 真火秘境
+│   │   │   ├── PlayerAttributeMgr.js # 砍树/灵脉/仙树
+│   │   │   ├── BagMgr.js            # 背包/斗法
+│   │   │   ├── CareerMgr.js         # 道途
+│   │   │   ├── PupilMgr.js          # 宗门
+│   │   │   ├── HeroRankMgr.js       # 群英榜
+│   │   │   ├── InvadeMgr.js         # 异兽入侵
+│   │   │   ├── WildBossMgr.js       # 挑战妖王
+│   │   │   ├── StarTrialMgr.js      # 星宿试炼
+│   │   │   ├── SkyWarMgr.js         # 征战诸天
+│   │   │   ├── TownDemonMgr.js      # 镇魔
+│   │   │   ├── ActivityMgr.js       # 活动
+│   │   │   ├── PetMgr.js            # 灵兽
+│   │   │   ├── FrogMgr.js           # 青蛙
+│   │   │   ├── AdRewardMgr.js       # 广告
+│   │   │   ├── MailMgr.js           # 邮件
+│   │   │   ├── UnionTreasureMgr.js  # 妖盟寻宝
+│   │   │   └── ...                  # 其他管理器
+│   │   ├── net/             # 网络通信
+│   │   │   ├── GameNetMgr.js        # WebSocket 连接管理
+│   │   │   ├── Protocol.js          # 协议定义
+│   │   │   └── ProtobufMgr.js       # Protobuf 编解码
+│   │   └── common/          # 公共模块
+│   │       ├── LoopMgr.js           # 任务循环调度
+│   │       ├── WorkFlowMgr.js       # 工作流管理
+│   │       ├── MsgRecvMgr.js        # 消息路由
+│   │       ├── RegistMgr.js         # 管理器注册
+│   │       └── SyncMgr.js           # 多账号同步
+│   ├── server/              # 管理服务器
+│   │   ├── server.js        # Express 服务
+│   │   ├── processManager.js        # 进程管理
+│   │   ├── database.js              # SQLite 数据库
+│   │   ├── authRoutes.js            # 认证路由
+│   │   ├── gameAccountRoutes.js     # 账号管理
+│   │   └── ...
+│   ├── loaders/             # 启动加载
+│   └── utils/               # 工具函数
+├── public/                  # Web 前端
+│   ├── index.html           # 控制台页面
+│   ├── login.html           # 登录页面
+│   ├── loader/              # 配置页面
+│   └── js/                  # 前端 JS
+├── package.json
+└── README.md
+```
+
+## 常见问题
+
+### 被手机顶号
+脚本检测到被顶号后会等待 5 分钟重连。
+
+### 功能不生效
+1. 检查 `account.json` 中对应开关是否为 `true`
+2. 查看日志定位问题
+3. 确保游戏系统已解锁对应功能
+
+### 服务器部署后功能失效
+1. 检查 PM2 进程状态：`pm2 list`
+2. 查看错误日志：`pm2 logs app --lines 50 --nostream`
+3. 确保代码已更新到最新：`git pull`
