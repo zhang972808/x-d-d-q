@@ -43,10 +43,11 @@ export async function startGameAccount(account) {
   // 检查是否已在运行
   if (processes.has(id)) {
     const existing = processes.get(id);
+    // 杀掉旧进程再重启
     if (existing.process && !existing.process.killed) {
-      throw new Error(`账号 "${nickname || id}" 已在运行中 (PID: ${existing.pid})`);
+      logger.info(`[ProcessManager] 账号 "${nickname || id}" 已在运行，先停止旧进程 (PID: ${existing.pid})`);
+      existing.process.kill("SIGTERM");
     }
-    // 清理僵尸记录
     processes.delete(id);
   }
 
