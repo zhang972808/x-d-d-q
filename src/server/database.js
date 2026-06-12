@@ -243,6 +243,11 @@ export function getAccountCountByUser(userId) {
   return row ? row.count : 0;
 }
 
+// 获取所有状态为 running 的游戏账号
+export function getRunningAccounts() {
+  return execAll('SELECT * FROM game_accounts WHERE status = ?', ['running']);
+}
+
 // ==================== 审计日志 ====================
 
 export function addAuditLog(userId, action, details = '', gameAccountId = null) {

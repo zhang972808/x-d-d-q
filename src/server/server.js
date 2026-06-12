@@ -7,7 +7,7 @@ import { WebSocketServer } from 'ws';
 import fs from 'fs';
 import logger from '#utils/logger.js';
 import { authMiddleware } from '#server/middleware.js';
-import { getActiveNotices, initDatabase } from '#server/database.js';
+import { getActiveNotices, getRunningAccounts, initDatabase } from '#server/database.js';
 import { getAllProcesses, getGameLogs, getGameStatus, startGameAccount, stopGameAccount } from '#server/processManager.js';
 
 // 路由
@@ -334,6 +334,24 @@ setInterval(() => {
 // ==================== 启动服务器 ====================
 async function start() {
   await initDatabase();
+
+  // 重启之前运行中的游戏账号
+  try {
+    const runningAccounts = getRunningAccounts();
+    if (runningAccounts.length > 0) {
+      console.log(`发现 ${runningAccounts.length} 个运行中的账号，自动重启...`);
+      for (const acc of runningAccounts) {
+        try {
+          await startGameAccount(acc);
+          console.log(`  ✅ ${acc.nickname || acc.id} 已重启`);
+        } catch (e) {
+          console.log(`  ❌ ${acc.nickname || acc.id} 重启失败: ${e.message}`);
+        }
+      }
+    }
+  } catch (e) {
+    console.log(`自动重启账号失败: ${e.message}`);
+  }
 
   server.listen(PORT, () => {
     console.log(`========================================`);
