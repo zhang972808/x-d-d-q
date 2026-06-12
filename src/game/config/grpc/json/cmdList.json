@@ -18120,13 +18120,47 @@
     null,
     null,
     null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
+    {
+        "comment": "切换道途",
+        "smMsgId": 8001,
+        "cmMethod": "CityMsg.CareerSwitchCareerReq",
+        "smMethod": "CityMsg.CareerSwitchCareerResp"
+    },
+    {
+        "comment": "道途数据同步",
+        "smMsgId": 8002,
+        "smMethod": "CityMsg.CareerPlayerDataMsg"
+    },
+    {
+        "comment": "修行",
+        "smMsgId": 8003,
+        "cmMethod": "CityMsg.CareerTrainReq",
+        "smMethod": "CityMsg.CareerTrainResp"
+    },
+    {
+        "comment": "挑战boss",
+        "smMsgId": 8004,
+        "cmMethod": "CityMsg.CareerBattleBossReq",
+        "smMethod": "CityMsg.CareerBattleBossResp"
+    },
+    {
+        "comment": "查询boss属性",
+        "smMsgId": 8005,
+        "cmMethod": "CityMsg.CareerGetBossAttrReq",
+        "smMethod": "CityMsg.CareerGetBossAttrResp"
+    },
+    {
+        "comment": "获取属性映射",
+        "smMsgId": 8006,
+        "cmMethod": "CityMsg.CareerGetAttrMapReq",
+        "smMethod": "CityMsg.CareerGetAttrMapResp"
+    },
+    {
+        "comment": "领取任务奖励",
+        "smMsgId": 8007,
+        "cmMethod": "CityMsg.CareerGetPreTaskRewardReq",
+        "smMethod": "CityMsg.CareerGetPreTaskRewardResp"
+    },
     null,
     null,
     null,
