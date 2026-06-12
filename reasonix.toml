@@ -90,13 +90,4 @@ network = true
 
 # External MCP servers. type: "stdio" (default, a subprocess) | "http" | "sse".
 # ${VAR} / ${VAR:-default} are expanded from the environment in command/args/env/url/headers.
-[[plugins]]
-name    = "github"
-command = "npx"
-args    = ["-y", "@modelcontextprotocol/server-github"]
-env     = { GITHUB_PERSONAL_ACCESS_TOKEN = "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" }
-
-[[plugins]]
-name    = "puppeteer"
-command = "npx"
-args    = ["-y", "@modelcontextprotocol/server-puppeteer"]
+# MCP servers configured via ~/.reasonix/config.json
