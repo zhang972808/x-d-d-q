@@ -93,6 +93,9 @@ export default class CareerMgr {
 
     if (msgData.bossData) {
       this.bossData = msgData.bossData;
+    } else if (this.bossData) {
+      // 服务器没返回bossData时，本地计数器+1
+      this.bossData.battleTimesToday = (this.bossData.battleTimesToday || 0) + 1;
     }
     if (msgData.maxTalentNode) {
       this.maxTalentNode = msgData.maxTalentNode;
