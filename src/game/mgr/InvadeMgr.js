@@ -1,4 +1,4 @@
-import GameNetMgr from "#game/net/GameNetMgr.js";
+﻿import GameNetMgr from "#game/net/GameNetMgr.js";
 import Protocol from "#game/net/Protocol.js";
 import logger from "#utils/logger.js";
 import PlayerAttributeMgr from "./PlayerAttributeMgr.js";
@@ -15,11 +15,6 @@ export default class InvadeMgr {
     }
 
     static get inst() {
-        if (!SystemUnlockMgr.INVADE) {
-            logger.warn(`[异兽入侵] ${global.colors.red}系统未解锁${global.colors.reset}`);
-            return null;
-        }
-
         if (!this._instance) {
             this._instance = new InvadeMgr();
         }

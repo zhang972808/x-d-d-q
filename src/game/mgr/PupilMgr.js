@@ -53,13 +53,34 @@ export default class PupilMgr {
             .map((site) => site.index);
     }
 
-    // 自动检查能量 毕业弟子 Loop在CustomMgr中
+    // 毕业→结伴→招人→锤炼
     async checkGraduatation(t) {
         if (!global.account.switch.pupil) {
             return;
         }
         if (t.ret === 0) {
-            // 判断是否可以招人
+            // 先毕业
+            const graduationIndices = this.getGraduationIndices(t.siteList);
+            if (graduationIndices.length > 0) {
+                logger.info(`[宗门管理] 出师 ${graduationIndices.length} 人`);
+                for (let i = 0; i < graduationIndices.length; i++) {
+                    GameNetMgr.inst.sendPbMsg(Protocol.S_PUPIL_GRADUATE, { siteIndex: graduationIndices[i] });
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+                }
+                // 有毕业 → 获取毕业生列表以便结伴
+                this._pendingPartner = true;
+                GameNetMgr.inst.sendPbMsg(Protocol.S_PUPIL_GET_GRADUATE_LIST, { type: 0 });
+                return;
+            }
+
+            // 没毕业但有毕业生待结伴 → 获取列表
+            if (t.allGraduatedNums > 0 || this._pendingPartner) {
+                this._pendingPartner = true;
+                GameNetMgr.inst.sendPbMsg(Protocol.S_PUPIL_GET_GRADUATE_LIST, { type: 0 });
+                return;
+            }
+
+            // 招人（有席位空着才招）
             const invitationCount = this.countElementsWithoutPupilData(t.siteList);
             if (invitationCount > 0) {
                 logger.info(`[宗门管理] 招 ${invitationCount} 人`);
@@ -69,19 +90,7 @@ export default class PupilMgr {
                 }
             }
 
-            // 判断是否可以出师
-            const graduationIndices = this.getGraduationIndices(t.siteList);
-            if (graduationIndices.length > 0) {
-                logger.info(`[宗门管理] 出师 ${graduationIndices.length} 人`);
-                for (let i = 0; i < graduationIndices.length; i++) {
-                    GameNetMgr.inst.sendPbMsg(Protocol.S_PUPIL_GRADUATE, { siteIndex: graduationIndices[i] });
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
-                    GameNetMgr.inst.sendPbMsg(Protocol.S_PUPIL_RECRUIT, {});
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
-                }
-            }
-
-            // 自动检查能量锤炼
+            // 锤炼
             GameNetMgr.inst.sendPbMsg(Protocol.S_PUPIL_TRAIN, { isOneKey: 1 });
         }
     }

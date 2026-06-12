@@ -8,6 +8,8 @@ export default class FrogMgr {
         this.AD_REWARD_DAILY_MAX_NUM = 6;   // 每日最大领取次数
         this.AD_REWARD_CD = 5 * 60 * 1000;  // 每次间隔时间 (5分钟)
         this.isProcessing = false;
+        this.getAdRewardTimes = 0;
+        this.lastAdRewardTime = 0;
     }
 
     static get inst() {

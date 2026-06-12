@@ -21,12 +21,14 @@ fs.readdir(dataDir, (err, files) => {
         return;
     }
 
+    const basePort = process.env.BASE_PORT || 8082;
+
     // 依次执行每个json配置文件
     jsonFiles.forEach((file, index) => {
         const filePath = path.join(dataDir, file);
-        logger.info(`开始执行第 ${index + 1} 个配置文件: ${file}`);
+        const port = parseInt(basePort) + index;
 
-        // 读取 JSON 文件，拼接 serverId 和 username 生成进程名
+        // 读取 JSON 文件，获取 serverId 和 username
         fs.readFile(filePath, 'utf8', (err, data) => {
             if (err) {
                 logger.error(`读取 ${filePath} 失败:`, err);
@@ -36,30 +38,30 @@ fs.readdir(dataDir, (err, files) => {
             try {
                 const account = JSON.parse(data);
                 const { serverId, username } = account;
-                
+
                 if (!serverId || !username) {
                     logger.error(`配置文件 ${file} 中缺少 serverId 或 username`);
                     return;
                 }
 
                 const processName = `${serverId}_${username}`;
-                logger.info(`启动进程名为: ${processName}`);
+                logger.info(`启动进程: ${processName} 端口: ${port}`);
 
-                // 构建 pm2 命令，设置 name 参数为拼接后的 processName
-                const command = `pm2 start app.js --cron-restart "1 0 * * *" --name "${processName}" -- ${filePath}  `;
-                logger.info(`执行命令:${command}`);
+                const deleteCmd = `pm2 delete "${processName}"`;
+                const startCmd = `pm2 start app.js --cron-restart "1 0 * * *" --name "${processName}" -- ${filePath} ${port}`;
 
-                exec(command, (error, stdout, stderr) => {
+                exec(deleteCmd, () => {
+                  // 忽略删除错误（进程可能不存在）
+                  exec(startCmd, (error, stdout, stderr) => {
                     if (error) {
-                        logger.error(`执行 ${file} 失败:`, error);
-                        return;
+                      logger.error(`执行 ${file} 失败:`, error);
+                      return;
                     }
-
-                    logger.info(`执行 ${file} 成功:`);
-                    logger.info(stdout);
+                    logger.info(`执行 ${file} 成功: ${stdout}`);
                     if (stderr) {
-                        logger.error(stderr);
+                      logger.error(stderr);
                     }
+                  });
                 });
             } catch (parseError) {
                 logger.error(`解析 ${filePath} 失败:`, parseError);

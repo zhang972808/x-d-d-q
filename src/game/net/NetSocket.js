@@ -77,12 +77,12 @@ class NetSocket {
 
     this.sio.onmessage = (event) => {
       const data = event.data;
-      if (data && data !== "null") {
+      if (data instanceof ArrayBuffer || Buffer.isBuffer(data)) {
+        const arrayBuffer = new Uint8Array(data);
+        if (this.parseArrayBuffMsg) this.parseArrayBuffMsg(arrayBuffer);
+      } else if (data && data !== "null") {
         this.msgQueue.push(data);
         this.readNextMsgData();
-      } else {
-        const arrayBuffer = new Uint8Array(event.data);
-        if (this.parseArrayBuffMsg) this.parseArrayBuffMsg(arrayBuffer);
       }
     };
 

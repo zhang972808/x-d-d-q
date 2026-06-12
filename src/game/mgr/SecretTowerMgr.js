@@ -39,6 +39,12 @@ export default class SecretTowerMgr {
         LoopMgr.inst.remove(this);
     }
 
+    // 每日重置挑战次数
+    resetDaily() {
+        this.challenge = global.account.switch.challenge || 0;
+        logger.info(`[六道秘境] 每日挑战次数重置为 ${this.challenge}`);
+    }
+
     SyncData(t) {
         logger.debug("[六道秘境] 初始化");
     }
@@ -59,6 +65,12 @@ export default class SecretTowerMgr {
     }
 
     async loopUpdate() {
+        const today = new Date(new Date().getTime() + 8 * 3600000).toISOString().slice(0, 10);
+        if (this._lastDay && this._lastDay !== today) {
+            this.resetDaily();
+        }
+        this._lastDay = today;
+
         if (!WorkFlowMgr.inst.canExecute("Challenge")) return;
         if (this.isProcessing || this.isSyncing) return;
         this.isProcessing = true;

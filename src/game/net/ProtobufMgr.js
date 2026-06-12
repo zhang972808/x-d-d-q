@@ -40,6 +40,14 @@ class ProtobufMgr {
         this.cmdList = JSON.parse(cmdListRes);
         this.resvCmdList = JSON.parse(resvCmdListRes);
 
+        // 根据 smMsgId 重新索引 cmdList，确保没有正确位置的条目能被找到
+        for (let i = 0; i < this.cmdList.length; i++) {
+            const entry = this.cmdList[i];
+            if (entry && entry.smMsgId != null && entry.smMsgId !== i) {
+                this.cmdList[entry.smMsgId] = entry;
+            }
+        }
+
         // 初始化 msgInfoDict
         for (const key in msgInfo) {
             const cmds = msgInfo[key];

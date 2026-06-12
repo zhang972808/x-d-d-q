@@ -77,6 +77,8 @@ export default class SkyWarMgr {
             this.refreshTimes = t.refreshTimes;
             this.enemyData = t.enemyData;
             this.battleTimes = t.battleTimes;
+            this.maxFightNum = t.battleTimes; // 以服务器实际剩余次数为准
+            this.fightNums = 0;               // 每次进入重置本地计数器
 
             if (this.enemyData.length == 0) {
                 logger.info(`[征战诸天] 征战诸天数据同步为空，可能未取得资格`);
@@ -131,7 +133,7 @@ export default class SkyWarMgr {
             logger.info(`[征战诸天] 征战诸天剩余次数:${t.battleTimes}`);
         }
 
-        this.initialized = true;
+        this.initialized = false; // 强制重新获取对手列表
     }
 
     // 处理征战

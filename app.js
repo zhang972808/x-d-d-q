@@ -34,6 +34,7 @@ async function start() {
     };
     global.configFile = configPath;
     global.messageDelay = 20;   // 默认延迟
+    global.port = process.env.PORT || process.argv[3] || 8082;
 
     await initialize();
 }

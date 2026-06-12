@@ -96,9 +96,17 @@ export default class YardDpbMgr {
                         logger.info(`[仙居管理] 开始收菜：${buildName}`);
                         GameNetMgr.inst.sendPbMsg(Protocol.S_YARDPB_BUILD_GAIN_REWARD, { uniqueId: uniqueId, buildId: buildId });
                     }
+                    if (buildId == 1001 && i.yardBuildDetailMsg.status == 0) {  // 炼药
+                        const num = Math.floor(this.grassNum / 500);
+                        if (num > 0) {
+                            GameNetMgr.inst.sendPbMsg(Protocol.S_YARDPB_BUILD_MAKE, { uniqueId: uniqueId, buildId: buildId, num: num, isCancel: false });
+                        }
+                    }
                     if (buildId == 1002 && i.yardBuildDetailMsg.status == 0) {  // 炼丹 grassNum / 500
                         const num = Math.floor(this.grassNum / 500);
-                        GameNetMgr.inst.sendPbMsg(Protocol.S_YARDPB_BUILD_MAKE, { uniqueId: uniqueId, buildId: buildId, num: num, isCancel: false });
+                        if (num > 0) {
+                            GameNetMgr.inst.sendPbMsg(Protocol.S_YARDPB_BUILD_MAKE, { uniqueId: uniqueId, buildId: buildId, num: num, isCancel: false });
+                        }
                     }
                     if (buildId == 1004 && i.yardBuildDetailMsg.status == 0) {  // 孕育。只孕育最后一个
                         const crop = this.YardCropMsg[this.YardCropMsg.length - 1]

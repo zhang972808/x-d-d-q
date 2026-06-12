@@ -4,14 +4,13 @@
 
 # 注意事项！！！
 > 本文来自于[https://github.com/gyn7561/xddq-assistant](https://github.com/gyn7561/xddq-assistant) <br/>
-> 本想实现新功能，但不会抓包，遂放弃 <br/>
 > 本文仅用于学习，针对此脚本获取到了收益， `你妈死了` <br/>
-> 最新更新于  `2025年3月27日` <br/>
+> 原始版本更新于 `2025年3月27日` <br/>
 > 作者：`wan-yoba` <br/>
-
+> 二次开发更新于 `2026年5月7日` <br/>
 
 ## 免责声明
-	
+
 本仓库仅供技术学习交流使用，如有下载相关文件，请在学习后24小时内删除相关内容。
 
 切勿在 tb/pdd 等商城的非法渠道付费此软件。
@@ -19,8 +18,13 @@
 如将本仓库教程/文件用于获利，那么：你妈死了。
 
 请勿将本项目内容用于非法用途，使用者在使用时即视为对行为可能产生的任何不良后果负责。
-	
+
 由于传播、利用此工具所提供的信息而造成的任何直接或者间接的后果及损失，均由使用者本人负责，作者不为此承担任何责任。
+
+## 新功能 (2026-05-07)
+
+### 自动连接游戏
+启动脚本后自动检测 `account.json` 中的账号密码，自动登录并连接游戏服务器。无需再手动点击"启动"按钮。
 
 ## 分支
 * 分支 `main` 为 单账号的服务端
@@ -65,6 +69,18 @@ docker run --name=xddq -dp 8082:8082 --restart=always -e TZ=Asia/Shanghai xddq-i
 
 ### windows 应用
 * 请下载 nodejs 的windows组件，切入目录，使用以下命令 `node app.js`
+* 指定配置文件：`node app.js "data/账号名.json"`
+* 指定端口（多账号）：`node app.js "data/账号名.json" 8083`
+* 开启 debug 日志：`set LOGLEVEL=debug && node app.js "data/账号名.json"`
+* 运行后自动登录游戏，无需额外操作
+
+### 多账号运行
+使用不同端口启动多个实例：
+```
+node app.js "data/子号1.json" 8082
+node app.js "data/子号2.json" 8083
+node app.js "data/子号3.json" 8084
+```
 
 ### windows 打包可执行文件
 * TODO // 尚未实现
@@ -76,6 +92,3 @@ docker run --name=xddq -dp 8082:8082 --restart=always -e TZ=Asia/Shanghai xddq-i
 
 ### 主界面
 ![image](https://github.com/user-attachments/assets/3614f840-5748-4eee-88e3-798c3b768a5c)
-
-
-

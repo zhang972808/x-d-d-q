@@ -1,6 +1,7 @@
 {
 	"Common": [],
-	"WatchPlayer": [{
+	"WatchPlayer": [
+		{
 			"key": "S_GET_PLAYER_DETAIL_DATA",
 			"comment": "获取玩家详细数据",
 			"cmMethod": "getPlayerDetailDataReq",
@@ -37,7 +38,8 @@
 			"smMethod": "CommonSearchPlayerResp"
 		}
 	],
-	"Login": [{
+	"Login": [
+		{
 			"key": "S_PLAYER_LOGIN",
 			"comment": "登陆消息",
 			"cmMethod": "ReqLoginMsg",
@@ -65,7 +67,8 @@
 			"smMethod": "RspConfigMsg"
 		}
 	],
-	"PlayerData": [{
+	"PlayerData": [
+		{
 			"key": "S_PLAYER_DATA_SYNC_MSG",
 			"comment": "用户信息同步",
 			"smMethod": "PlayerDataMsg"
@@ -159,7 +162,8 @@
 			"smMethod": "DeletePlayerResp"
 		}
 	],
-	"PlayerSystem": [{
+	"PlayerSystem": [
+		{
 			"key": "S_SYSTEM_UNLOCK_SYNC_MSG",
 			"comment": "系统解锁同步",
 			"smMethod": "SystemUnlockSync"
@@ -171,7 +175,8 @@
 			"smMethod": "GetSysRewardResp"
 		}
 	],
-	"SdkReward": [{
+	"SdkReward": [
+		{
 			"key": "S_RECEIVE_SDK_REWARD_SYN",
 			"comment": "同步sdk奖励数据",
 			"smMethod": "ReceiveSdkRewardSyn"
@@ -213,7 +218,8 @@
 			"smMethod": "ReceiveSdkDailyRewardRsp"
 		}
 	],
-	"Attribute": [{
+	"Attribute": [
+		{
 			"key": "S_ATTRIBUTE_DATA_SYNC_MSG",
 			"comment": "玩家属性信息同步",
 			"smMethod": "PlayerAttributeDataMsg"
@@ -290,7 +296,8 @@
 			"smMethod": "GetSeparationDataMsgListResp"
 		}
 	],
-	"Bag": [{
+	"Bag": [
+		{
 			"key": "S_BAG_DATA_SYNC_MSG",
 			"comment": "同步背包数据",
 			"smMethod": "SyncBagMsg"
@@ -326,7 +333,8 @@
 			"byteDecode": "ChangeRoleParam"
 		}
 	],
-	"Battle": [{
+	"Battle": [
+		{
 			"key": "S_BATTLE_TEST",
 			"comment": "测试战斗",
 			"smMethod": "BattleRecordMsg"
@@ -365,7 +373,8 @@
 			"byteDecode": "BossSpecialSkillAction"
 		}
 	],
-	"Stage": [{
+	"Stage": [
+		{
 			"key": "S_STAGE_CHALLENGE",
 			"comment": "关卡挑战",
 			"smMethod": "ChallengeRspMsg"
@@ -376,7 +385,8 @@
 			"smMethod": "PlayerStageData"
 		}
 	],
-	"Invade": [{
+	"Invade": [
+		{
 			"key": "S_INVADE_CHALLENGE",
 			"comment": "异兽入侵挑战",
 			"smMethod": "InvadeChallengeResp"
@@ -387,7 +397,8 @@
 			"smMethod": "InvadeDataMsg"
 		}
 	],
-	"Task": [{
+	"Task": [
+		{
 			"key": "S_TASK_DATA_SEND",
 			"comment": "玩家登录任务数据下发",
 			"smMethod": "TaskDataListMsg"
@@ -410,7 +421,8 @@
 			"smMethod": "WatchAdResp"
 		}
 	],
-	"Mail": [{
+	"Mail": [
+		{
 			"key": "S_MAIL_LIST",
 			"comment": "邮件列表数据同步",
 			"smMethod": "MailListMsg"
@@ -451,7 +463,8 @@
 			"smMethod": "MailDeleteAllResp"
 		}
 	],
-	"RedPoint": [{
+	"RedPoint": [
+		{
 			"key": "S_SYSTEM_RED_POINT_SYNC",
 			"comment": "系统红点同步",
 			"smMethod": "SystemRedPointSync"
@@ -462,7 +475,8 @@
 			"smMethod": "ActivityRedPointSync"
 		}
 	],
-	"UnionBounty": [{
+	"UnionBounty": [
+		{
 			"key": "S_UNION_BOUNTY_ENTRY_MAP",
 			"comment": "妖盟悬赏-打开护送地图",
 			"cmMethod": "UnionBountyEnterMapReq",
@@ -589,7 +603,8 @@
 			"smMethod": "UnionBountyMonsterChangePosRsp"
 		}
 	],
-	"Mall": [{
+	"Mall": [
+		{
 			"key": "S_MALL_BUY_COUNT_SYNC",
 			"comment": "商品购买数量集合",
 			"smMethod": "MallBuyCountListMsg"
@@ -607,7 +622,8 @@
 			"smMethod": "MallRandomGoodsRespMsg"
 		}
 	],
-	"Recharge": [{
+	"Recharge": [
+		{
 			"key": "S_NOTIFY_RECHARGE_SUCCESS",
 			"comment": "通知充值到账",
 			"smMethod": "NotifyRechargeSuccess"
@@ -634,7 +650,8 @@
 			"byteDecode": "ExtraParam"
 		}
 	],
-	"ActivityBase": [{
+	"ActivityBase": [
+		{
 			"key": "S_ACTIVITY_SYNC_MAIN_CONFIG_LIST",
 			"comment": "活动通用数据同步",
 			"smMethod": "PushActivityList"
@@ -789,7 +806,8 @@
 			"smMethod": "ActivityConditionSelectDataListSync"
 		}
 	],
-	"Cloud": [{
+	"Cloud": [
+		{
 			"key": "S_CLOUD_PLAYER_DATA_SYNC",
 			"comment": "筋斗云数据同步",
 			"smMethod": "PlayerCloudDataMsg"
@@ -831,7 +849,8 @@
 			"smMethod": "CloudSkinLvUpResp"
 		}
 	],
-	"CloudRefine": [{
+	"CloudRefine": [
+		{
 			"key": "S_CLOUD_REFINE_PLAYER_DATA_SYNC",
 			"comment": "筋斗云注灵数据同步",
 			"smMethod": "CloudRefinePlayerDataMsg"
@@ -849,7 +868,8 @@
 			"smMethod": "CloudRefineStarLvUpResp"
 		}
 	],
-	"WildBoss": [{
+	"WildBoss": [
+		{
 			"key": "S_WILDBOSS_SYNC",
 			"comment": "同步宝地",
 			"smMethod": "WildBossDataSync"
@@ -867,7 +887,8 @@
 			"smMethod": "WildBossRepeatResp"
 		}
 	],
-	"Pet": [{
+	"Pet": [
+		{
 			"key": "S_PET_DATA_SYNC",
 			"comment": "同步玩家灵兽数据",
 			"smMethod": "PlayerPetDataSync"
@@ -1017,7 +1038,8 @@
 			"smMethod": "PetUpSkinCombineResp"
 		}
 	],
-	"WorldMessage": [{
+	"WorldMessage": [
+		{
 			"key": "S_WORLD_MESSAGE_LIST",
 			"comment": "世界消息列表，登录时下发",
 			"smMethod": "WorldMessageListMsg"
@@ -1148,7 +1170,8 @@
 			"smMethod": "PlayerEmoticonDataSync"
 		}
 	],
-	"Tower": [{
+	"Tower": [
+		{
 			"key": "S_TOWER_SYNC_DATA",
 			"comment": "同步数据",
 			"smMethod": "TowerDataMsg"
@@ -1193,7 +1216,8 @@
 			"smMethod": "SaveSelectOptionResp"
 		}
 	],
-	"Rank": [{
+	"Rank": [
+		{
 			"key": "S_RANK_GET_LIST",
 			"comment": "获取排行列表",
 			"cmMethod": "GetRankListReq",
@@ -1214,7 +1238,8 @@
 			"smMethod": "GetUnionMemberScoreRsp"
 		}
 	],
-	"Talent": [{
+	"Talent": [
+		{
 			"key": "S_TALENT_SYNC_DATA",
 			"comment": "同步神通数据",
 			"smMethod": "TalentPlayerDataMsg"
@@ -1244,7 +1269,8 @@
 			"smMethod": "GetUnDealTalentMsgResp"
 		}
 	],
-	"Spirit": [{
+	"Spirit": [
+		{
 			"key": "S_SPIRIT_SYNC_DATA",
 			"comment": "同步玩家精怪数据",
 			"smMethod": "SpiritPlayerDataMsg"
@@ -1298,7 +1324,8 @@
 			"smMethod": "SpiritLevelUnlockShowResp"
 		}
 	],
-	"PrivilegeCard": [{
+	"PrivilegeCard": [
+		{
 			"key": "S_PRIVILEGE_CARD_SYNC_DATA",
 			"comment": "同步特权卡数据",
 			"cmMethod": "",
@@ -1311,7 +1338,8 @@
 			"smMethod": "PrivilegeCardReceiveRewardRsp"
 		}
 	],
-	"BallGVG": [{
+	"BallGVG": [
+		{
 			"key": "S_BALLGVG_SYNC_ATTACKED",
 			"comment": "被打同步（有人被打即时同步）",
 			"cmMethod": "",
@@ -1486,7 +1514,8 @@
 			"smMethod": "BallGVGRedDotRespMsg"
 		}
 	],
-	"Homeland": [{
+	"Homeland": [
+		{
 			"key": "S_HOMELAND_SYNC_MSG",
 			"comment": "同步信息",
 			"cmMethod": "",
@@ -1619,7 +1648,8 @@
 			"smMethod": "SyncLeaveHomeLand"
 		}
 	],
-	"PlayerChara": [{
+	"PlayerChara": [
+		{
 			"key": "S_PLAYER_CHARA_DATA_SYNC",
 			"comment": "玩家形象同步",
 			"cmMethod": "",
@@ -1674,7 +1704,8 @@
 			"smMethod": "UpgradePlayerCharaResp"
 		}
 	],
-	"Palace": [{
+	"Palace": [
+		{
 			"key": "S_PALACE_SYNC",
 			"comment": "仙宫数据同步",
 			"cmMethod": "",
@@ -1741,7 +1772,8 @@
 			"smMethod": "GetTitleIdListRsp"
 		}
 	],
-	"RankBattle": [{
+	"RankBattle": [
+		{
 			"key": "S_RANK_BATTLE_CHALLENGE",
 			"comment": "挑战请求",
 			"cmMethod": "RankBattleChallengeReq",
@@ -1783,13 +1815,16 @@
 			"smMethod": "RankBattleServerListResp"
 		}
 	],
-	"FundsActivity": [{
-		"key": "S_ACTIVITY_FUNDS_GET_REWARD",
-		"comment": "领取基金活动任务条件奖励",
-		"cmMethod": "ReqGetFundsConditionReward",
-		"smMethod": "RspGetFundsConditionReward"
-	}],
-	"Union": [{
+	"FundsActivity": [
+		{
+			"key": "S_ACTIVITY_FUNDS_GET_REWARD",
+			"comment": "领取基金活动任务条件奖励",
+			"cmMethod": "ReqGetFundsConditionReward",
+			"smMethod": "RspGetFundsConditionReward"
+		}
+	],
+	"Union": [
+		{
 			"key": "S_UNION_CREATE",
 			"comment": "创建妖盟",
 			"cmMethod": "ReqUnionCreate",
@@ -2040,7 +2075,8 @@
 			"smMethod": "YardUnionHelpResp"
 		}
 	],
-	"Destiny": [{
+	"Destiny": [
+		{
 			"key": "S_DESTINY_DATA_SYNC",
 			"comment": "数据同步",
 			"cmMethod": "",
@@ -2095,7 +2131,8 @@
 			"smMethod": "DestinySwitchLinkageSkinResp"
 		}
 	],
-	"LuckyDrawActivity": [{
+	"LuckyDrawActivity": [
+		{
 			"key": "S_ACTIVITY_LUCKY_DRAW",
 			"comment": "运势抽奖请求",
 			"cmMethod": "LuckyDrawReq",
@@ -2110,7 +2147,8 @@
 			"byteDecode": "LuckyDrawActivityDataMsg"
 		}
 	],
-	"ADTimeActivity": [{
+	"ADTimeActivity": [
+		{
 			"key": "S_WELFARE_GIFT_KR",
 			"comment": "缩时香礼包",
 			"cmMethod": "ADTimeTriggerReq",
@@ -2123,7 +2161,8 @@
 			"smMethod": ""
 		}
 	],
-	"UnionAreaWar": [{
+	"UnionAreaWar": [
+		{
 			"comment": "UnionAreaWarConfigsSync解析",
 			"byteDecode": "UnionAreaWarConfigsSync"
 		},
@@ -2292,7 +2331,8 @@
 			"smMethod": "UnionAreaWarDanGroupCountResp"
 		}
 	],
-	"SpiritTrialActivity": [{
+	"SpiritTrialActivity": [
+		{
 			"comment": "SpiritTrialActivityConfig解析",
 			"byteDecode": "SpiritTrialActivityConfig"
 		},
@@ -2313,7 +2353,8 @@
 			"smMethod": "BattleEvilThingResp"
 		}
 	],
-	"OptionalGiftActivity": [{
+	"OptionalGiftActivity": [
+		{
 			"key": "S_ACTIVITY_OPTIONAL_GIFT_SELECT",
 			"comment": "自选礼包选择道具",
 			"cmMethod": "SelectItemsReq",
@@ -2324,11 +2365,14 @@
 			"byteDecode": "OptionalGiftActivityDataMsg"
 		}
 	],
-	"WelfareGiftActivity": [{
-		"comment": "WelfareGiftActivityPlayerDataSync解析",
-		"byteDecode": "WelfareGiftActivityPlayerDataSync"
-	}],
-	"WeekCardActivity": [{
+	"WelfareGiftActivity": [
+		{
+			"comment": "WelfareGiftActivityPlayerDataSync解析",
+			"byteDecode": "WelfareGiftActivityPlayerDataSync"
+		}
+	],
+	"WeekCardActivity": [
+		{
 			"comment": "WeekCardActivityDataSync解析",
 			"byteDecode": "WeekCardActivityDataSync"
 		},
@@ -2339,7 +2383,8 @@
 			"smMethod": "XyFundGetRewardResp"
 		}
 	],
-	"GoodFortuneActivity": [{
+	"GoodFortuneActivity": [
+		{
 			"comment": "GoodFortunePlayerDataMsg解析",
 			"byteDecode": "GoodFortunePlayerDataMsg"
 		},
@@ -2350,7 +2395,8 @@
 			"smMethod": "GoodFortuneGetRewardRsp"
 		}
 	],
-	"InviteFriends": [{
+	"InviteFriends": [
+		{
 			"key": "S_BIND_INVITE_CODE",
 			"comment": "绑定邀请码",
 			"cmMethod": "ReqBindInviteCode",
@@ -2363,7 +2409,8 @@
 			"smMethod": "RspGetBindInviteCode"
 		}
 	],
-	"MessageSubscribe": [{
+	"MessageSubscribe": [
+		{
 			"key": "S_SET_MESSAGE_SUBSCRIBE",
 			"comment": "设置订阅消息",
 			"cmMethod": "SetMessageSubscribeDataReqMsg",
@@ -2376,7 +2423,8 @@
 			"smMethod": "MessageSubscribeInfo"
 		}
 	],
-	"AdReward": [{
+	"AdReward": [
+		{
 			"key": "S_AD_REWARD_DATA_SYNC",
 			"comment": "数据同步",
 			"cmMethod": "",
@@ -2389,7 +2437,8 @@
 			"smMethod": "GetAdRewardResp"
 		}
 	],
-	"CutPrice": [{
+	"CutPrice": [
+		{
 			"key": "S_CUT_PRICE_SYNC",
 			"comment": "砍价数据同步",
 			"smMethod": "CutPriceDataMsg"
@@ -2407,7 +2456,8 @@
 			"smMethod": "CutPriceBuyRespMsg"
 		}
 	],
-	"HeroRank": [{
+	"HeroRank": [
+		{
 			"key": "S_HERORANK_ENTER",
 			"comment": "进入群英榜",
 			"cmMethod": "",
@@ -2456,7 +2506,8 @@
 			"smMethod": "RspHeroRankBuyEnergy"
 		}
 	],
-	"PetDreamLandActivityProto": [{
+	"PetDreamLandActivityProto": [
+		{
 			"comment": "PetDreamLandActivityConfig解析",
 			"byteDecode": "PetDreamLandActivityConfig"
 		},
@@ -2495,7 +2546,8 @@
 			"smMethod": "RspPetDreamLandAdventureGetAward"
 		}
 	],
-	"Magic": [{
+	"Magic": [
+		{
 			"key": "S_MAGIC_PLAYER_DATA_SYNC",
 			"comment": "神通数据同步",
 			"smMethod": "PlayerMagicDataMsg"
@@ -2579,7 +2631,8 @@
 			"smMethod": "UnEquipStoneResp"
 		}
 	],
-	"WildZoneActivityProto": [{
+	"WildZoneActivityProto": [
+		{
 			"comment": "蛮荒妖域活动数据解析解析",
 			"byteDecode": "ManHuangUserDataEntity"
 		},
@@ -2763,7 +2816,8 @@
 			"smMethod": "ManHuangMarqueeNotify"
 		}
 	],
-	"UnionBattle": [{
+	"UnionBattle": [
+		{
 			"key": "S_UNION_BATTLE_ENTER",
 			"comment": "进入妖盟乱斗",
 			"cmMethod": "UnionBattleEnterReq",
@@ -2835,7 +2889,8 @@
 			"smMethod": "SynPlayerInfo"
 		}
 	],
-	"EquipmentAdvance": [{
+	"EquipmentAdvance": [
+		{
 			"key": "S_EQUIPMENT_REFINE",
 			"comment": "精炼",
 			"cmMethod": "ReqEquipmentRefine",
@@ -2859,7 +2914,8 @@
 			"smMethod": "EquipmentAdvanceDataMsg"
 		}
 	],
-	"SecretTower": [{
+	"SecretTower": [
+		{
 			"key": "S_SECRETTOWER_ENTER",
 			"comment": "进入秘境",
 			"cmMethod": "SecretTowerEnterReq",
@@ -2901,7 +2957,8 @@
 			"smMethod": "SecretTowerGetAchiRewardRsp"
 		}
 	],
-	"UnionBoss": [{
+	"UnionBoss": [
+		{
 			"key": "S_UNION_BOSS_ENTER",
 			"comment": "进入妖邪讨伐",
 			"cmMethod": "UnionBossInfoReqMsg",
@@ -2954,7 +3011,8 @@
 			"smMethod": "UnionBossBuff"
 		}
 	],
-	"MagicTreasure": [{
+	"MagicTreasure": [
+		{
 			"key": "S_MAGIC_TREASURE_PLAYER_DATA_MSG",
 			"comment": "玩家法宝数据",
 			"smMethod": "MagicTreasurePlayerDataMsg"
@@ -2995,12 +3053,15 @@
 			"smMethod": "MagicTreasureSwitchLinkageSkinResp"
 		}
 	],
-	"MallShield": [{
-		"key": "S_SHIELD_MALL_RECHARGE_ID",
-		"comment": "同步渠道屏蔽商城付费项列表",
-		"smMethod": "MallRechargeIdShieldSync"
-	}],
-	"SeekTreasure": [{
+	"MallShield": [
+		{
+			"key": "S_SHIELD_MALL_RECHARGE_ID",
+			"comment": "同步渠道屏蔽商城付费项列表",
+			"smMethod": "MallRechargeIdShieldSync"
+		}
+	],
+	"SeekTreasure": [
+		{
 			"comment": "seektreasure_draw配置表解析",
 			"byteDecode": "SeekTreasureConfigsSync"
 		},
@@ -3039,7 +3100,8 @@
 			"smMethod": "SeekTreasureSelectRewardRespMsg"
 		}
 	],
-	"WestTravel": [{
+	"WestTravel": [
+		{
 			"key": "S_WEST_TRAVEL_PASS_GAME",
 			"comment": "通关请求",
 			"cmMethod": "WestTravelPassGameReq",
@@ -3054,7 +3116,8 @@
 			"byteDecode": "WestTravelDataMsgSync"
 		}
 	],
-	"AskWay": [{
+	"AskWay": [
+		{
 			"key": "S_ASKWAY_ENTER",
 			"comment": "进入活动",
 			"cmMethod": "AskWayEnterReq",
@@ -3173,13 +3236,16 @@
 			"smMethod": "AskWayGetGetCurStateInfoRsp"
 		}
 	],
-	"ForbiddenTrials": [{
-		"key": "S_PLAYER_FORBIDDEN_TRAILS_GET_REWARD",
-		"comment": "禁地试炼领奖",
-		"cmMethod": "ForbiddenTrailsGetRewardReq",
-		"smMethod": "ForbiddenTrailsGetRewardResp"
-	}],
-	"StarTrial": [{
+	"ForbiddenTrials": [
+		{
+			"key": "S_PLAYER_FORBIDDEN_TRAILS_GET_REWARD",
+			"comment": "禁地试炼领奖",
+			"cmMethod": "ForbiddenTrailsGetRewardReq",
+			"smMethod": "ForbiddenTrailsGetRewardResp"
+		}
+	],
+	"StarTrial": [
+		{
 			"key": "S_STARTRIAL_DATA_SYNC",
 			"comment": "星宿试炼数据同步",
 			"smMethod": "StarTrialDataMsg"
@@ -3245,7 +3311,8 @@
 			"smMethod": "StarTrialEnterMainPanelResp"
 		}
 	],
-	"GatherEnergy": [{
+	"GatherEnergy": [
+		{
 			"key": "S_SYNC_GATHER_ENERGY_MSG",
 			"comment": "同步聚灵阵数据",
 			"cmMethod": "",
@@ -3354,7 +3421,8 @@
 			"smMethod": "GatherEnergyGetADAwardResp"
 		}
 	],
-	"GodIsland": [{
+	"GodIsland": [
+		{
 			"comment": "GodIslandConfigSync解析",
 			"byteDecode": "GodIslandConfigSync"
 		},
@@ -3725,7 +3793,8 @@
 			"smMethod": "GodIslandUnionMemberScoreListResp"
 		}
 	],
-	"UnionFight": [{
+	"UnionFight": [
+		{
 			"key": "S_UNION_FIGHT_LOGIN_SYNC",
 			"comment": "妖盟夺位战登录数据",
 			"smMethod": "UnionFightApplyDataSync"
@@ -3837,13 +3906,16 @@
 			"smMethod": "RspUnionList"
 		}
 	],
-	"PigEscape": [{
-		"key": "S_PIG_ESCAPE_GET_REWARD",
-		"comment": "熊口逃生领奖",
-		"cmMethod": "CutRopeGetRewardReq",
-		"smMethod": "CutRopeGetRewardRsp"
-	}],
-	"GoodsShield": [{
+	"PigEscape": [
+		{
+			"key": "S_PIG_ESCAPE_GET_REWARD",
+			"comment": "熊口逃生领奖",
+			"cmMethod": "CutRopeGetRewardReq",
+			"smMethod": "CutRopeGetRewardRsp"
+		}
+	],
+	"GoodsShield": [
+		{
 			"key": "S_GOODSSHIELD_DATA_SYNC",
 			"comment": "道具屏蔽列表同步",
 			"smMethod": "GoodsShieldSync"
@@ -3854,12 +3926,15 @@
 			"smMethod": "ActivityPosterShieldSync"
 		}
 	],
-	"SystemShield": [{
-		"key": "S_SYSTEMSHIELD_DATA_SYNC",
-		"comment": "系统屏蔽列表同步",
-		"smMethod": "SystemShieldSync"
-	}],
-	"MiniGames": [{
+	"SystemShield": [
+		{
+			"key": "S_SYSTEMSHIELD_DATA_SYNC",
+			"comment": "系统屏蔽列表同步",
+			"smMethod": "SystemShieldSync"
+		}
+	],
+	"MiniGames": [
+		{
 			"key": "S_MINI_GAMES_REWARD",
 			"comment": "小游戏领奖",
 			"cmMethod": "ReceiveMiniGamesRewardReq",
@@ -3889,11 +3964,14 @@
 			"smMethod": "MiniGamesWestJourneyData"
 		}
 	],
-	"HolidayPresent": [{
-		"comment": "HolidayGiftActivityPlayerDataMsg解析",
-		"byteDecode": "HolidayGiftActivityPlayerDataMsg"
-	}],
-	"ADGiftActivity": [{
+	"HolidayPresent": [
+		{
+			"comment": "HolidayGiftActivityPlayerDataMsg解析",
+			"byteDecode": "HolidayGiftActivityPlayerDataMsg"
+		}
+	],
+	"ADGiftActivity": [
+		{
 			"key": "S_ADGIFTPB_TRIGGER",
 			"comment": "支付宝广告礼包-触发",
 			"cmMethod": "ADGiftTriggerReq",
@@ -3910,7 +3988,8 @@
 			"byteDecode": "ADGiftActivityPlayerDataSync"
 		}
 	],
-	"Mark": [{
+	"Mark": [
+		{
 			"key": "S_SYNC_MARK_STATE_MSG",
 			"comment": "同步评分状态",
 			"smMethod": "SyncMarkStateMsg"
@@ -3922,7 +4001,8 @@
 			"smMethod": "MarkFinishResp"
 		}
 	],
-	"WorldRule": [{
+	"WorldRule": [
+		{
 			"key": "S_WORLD_RULE_PLAYER_DATA_SYNC",
 			"comment": "天地法则玩家数据同步",
 			"smMethod": "WorldRulePlayerDataMsg"
@@ -3952,7 +4032,8 @@
 			"smMethod": "WorldRuleSwitchProgrammeResp"
 		}
 	],
-	"PackagesBase": [{
+	"PackagesBase": [
+		{
 			"key": "S_SKY_WAR_DATA_LOGIN_SYNC",
 			"comment": "征战诸天数据登录同步，阶段变化同步1",
 			"smMethod": "SkyWarDataLoginSync"
@@ -4217,7 +4298,8 @@
 			"smMethod": "PlanesTrialChallengeTimeRsp"
 		}
 	],
-	"UnionDuel": [{
+	"UnionDuel": [
+		{
 			"key": "S_UNION_DUEL_APPLY",
 			"comment": "妖盟对决-报名",
 			"cmMethod": "UnionDuelApplyReq",
@@ -4254,7 +4336,8 @@
 			"smMethod": "UnionDuelRewardPreviewResp"
 		}
 	],
-	"SignInFundActivity": [{
+	"SignInFundActivity": [
+		{
 			"comment": "SignInFundPlayerDataMsg解析",
 			"byteDecode": "SignInFundPlayerDataMsg"
 		},
@@ -4265,12 +4348,15 @@
 			"smMethod": "RspSignInFundRepair"
 		}
 	],
-	"ActivitysShield": [{
-		"key": "S_ACTIVITY_SHIELD_SYNC",
-		"comment": "活动屏蔽同步",
-		"smMethod": "ActivityShieldSync"
-	}],
-	"UnionBlessing": [{
+	"ActivitysShield": [
+		{
+			"key": "S_ACTIVITY_SHIELD_SYNC",
+			"comment": "活动屏蔽同步",
+			"smMethod": "ActivityShieldSync"
+		}
+	],
+	"UnionBlessing": [
+		{
 			"key": "S_UNION_BLESSING_SEND_GIFT",
 			"comment": "妖盟赐福",
 			"cmMethod": "UnionBlessingSendGiftReq",
@@ -4295,7 +4381,8 @@
 			"smMethod": "UnionBlessingCountSyncList"
 		}
 	],
-	"FirstRechargeActivity": [{
+	"FirstRechargeActivity": [
+		{
 			"key": "S_FIRST_RECHARGE_GET_REWARD",
 			"comment": "首充领取奖励",
 			"cmMethod": "GetMallRewardReq",
@@ -4306,7 +4393,8 @@
 			"byteDecode": "FirstRechargeActivityPlayerDataSync"
 		}
 	],
-	"NewYearRedBag": [{
+	"NewYearRedBag": [
+		{
 			"key": "NewYearRedBagPb_PlayerData",
 			"comment": "新春红包 登录数据下发",
 			"smMethod": "NewYearRedBagPlayerData"
@@ -4335,7 +4423,8 @@
 			"smMethod": "NewYearSyncNoticeRespMsg"
 		}
 	],
-	"FestivalCelebrations": [{
+	"FestivalCelebrations": [
+		{
 			"key": "S_FESTIVAL_CELEBRATIONS_PLAYER_INFO_MSG",
 			"comment": "庆典玩家数据同步",
 			"smMethod": "FestivalCelebrationsPlayerInfoMsg"
@@ -4457,7 +4546,8 @@
 			"smMethod": "FestivalCelebrationsWorshipResp"
 		}
 	],
-	"UnionTreasure": [{
+	"UnionTreasure": [
+		{
 			"key": "S_UNION_TREASURE_ENTER",
 			"comment": "妖盟寻宝进入界面",
 			"cmMethod": "UnionTreasureEnterReq",
@@ -4559,9 +4649,9 @@
 			"cmMethod": "UnionTreasureGetBattleRecordReq",
 			"smMethod": "UnionTreasureGetBattleRecordResp"
 		}
-
 	],
-	"PetKernel": [{
+	"PetKernel": [
+		{
 			"key": "S_PET_KERNEL_DRAW",
 			"comment": "抽取灵兽内丹",
 			"cmMethod": "PetKernelDrawReq",
@@ -4604,7 +4694,8 @@
 			"smMethod": "PetKernelPlayerDataMsg"
 		}
 	],
-	"GodDemonBattle": [{
+	"GodDemonBattle": [
+		{
 			"comment": "活动表配置",
 			"byteDecode": "GodDemonBattleConfig"
 		},
@@ -4621,19 +4712,24 @@
 			"smMethod": "GodDemonBattleGetCampSettlementResp"
 		}
 	],
-	"GroupInfo": [{
-		"key": "S_GET_GROUP_INFO",
-		"comment": "获取系统分组信息",
-		"cmMethod": "GetSystemGroupInfoReq",
-		"smMethod": "GetSystemGroupInfoResp"
-	}],
-	"MemoryCollect": [{
-		"key": "S_MEMORY_COLLECT_LOGIN_SYNC_DATA",
-		"comment": "集卡登录同步",
-		"cmMethod": "",
-		"smMethod": "MemoryCollectLoginSyncData"
-	}],
-	"MeiTuanSubscribe": [{
+	"GroupInfo": [
+		{
+			"key": "S_GET_GROUP_INFO",
+			"comment": "获取系统分组信息",
+			"cmMethod": "GetSystemGroupInfoReq",
+			"smMethod": "GetSystemGroupInfoResp"
+		}
+	],
+	"MemoryCollect": [
+		{
+			"key": "S_MEMORY_COLLECT_LOGIN_SYNC_DATA",
+			"comment": "集卡登录同步",
+			"cmMethod": "",
+			"smMethod": "MemoryCollectLoginSyncData"
+		}
+	],
+	"MeiTuanSubscribe": [
+		{
 			"key": "S_MEI_TUAN_SUBSCRIBE_SYNC",
 			"comment": "同步美团订阅数据",
 			"smMethod": "SyncMeiTuanSubscribeMsg"
@@ -4651,7 +4747,8 @@
 			"smMethod": "MeiTuanSubscribeRewardResp"
 		}
 	],
-	"MeiTuanDaily": [{
+	"MeiTuanDaily": [
+		{
 			"key": "S_MEI_TUAN_DAILY_SYNC",
 			"comment": "同步美团日常信息",
 			"smMethod": "SyncMeiTuanDailyMsg"
@@ -4669,13 +4766,16 @@
 			"smMethod": "MeiTuanDailyRewardResp"
 		}
 	],
-	"LiveShowActivity": [{
-		"key": "S_LIVE_SHOW_NOTIFY_REQ",
-		"comment": "同步直播状态",
-		"cmMethod": "LiveShowNotifyReqMsg",
-		"smMethod": "LiveShowNotifyRespMsg"
-	}],
-	"ComposeBall": [{
+	"LiveShowActivity": [
+		{
+			"key": "S_LIVE_SHOW_NOTIFY_REQ",
+			"comment": "同步直播状态",
+			"cmMethod": "LiveShowNotifyReqMsg",
+			"smMethod": "LiveShowNotifyRespMsg"
+		}
+	],
+	"ComposeBall": [
+		{
 			"comment": "ComposeBallConfigSync解析",
 			"byteDecode": "ComposeBallConfigSync"
 		},
@@ -4714,7 +4814,8 @@
 			"smMethod": "ComposeBallSettleResp"
 		}
 	],
-	"Friend": [{
+	"Friend": [
+		{
 			"key": "S_FRIEND_GET_LIST",
 			"comment": "获取世交列表",
 			"cmMethod": "FriendGetListReq",
@@ -4745,7 +4846,8 @@
 			"smMethod": "FriendDeleteResp"
 		}
 	],
-	"Monopoly": [{
+	"Monopoly": [
+		{
 			"key": "S_MONOPOLY_ENTER_ACTIVITY",
 			"comment": "进入活动",
 			"cmMethod": "MonopolyEnterActivityReq",
@@ -5026,7 +5128,8 @@
 			"smMethod": "MonopolyGuessRewardResp"
 		}
 	],
-	"PlanesTrial": [{
+	"PlanesTrial": [
+		{
 			"key": "S_PLANES_TRIAL_ENTER",
 			"comment": "进入三界征途界面",
 			"cmMethod": "EnterPlanesTrialReq",
@@ -5067,17 +5170,20 @@
 			"comment": "踢出队伍",
 			"cmMethod": "PlanesTrialKickOutTeamReq",
 			"smMethod": "PlanesTrialKickOutTeamRsp"
-		}, {
+		},
+		{
 			"key": "S_PLANES_TRIAL_APPLY_JOIN_TEAM_AGREE",
 			"comment": "同意申请",
 			"cmMethod": "PlanesTrialApplyJoinTeamAgreeReq",
 			"smMethod": "PlanesTrialApplyJoinTeamAgreeRsp"
-		}, {
+		},
+		{
 			"key": "S_PLANES_TRIAL_APPLY_JOIN_TEAM_REFUSED",
 			"comment": "一键拒绝",
 			"cmMethod": "PlanesTrialApplyJoinTeamRefusedReq",
 			"smMethod": "PlanesTrialApplyJoinTeamRefusedRsp"
-		}, {
+		},
+		{
 			"key": "S_PLANES_TRIAL_GET_TEAM_INFO",
 			"comment": "查找队伍",
 			"cmMethod": "PlanesTrialGetTeamInfoReq",
@@ -5352,7 +5458,8 @@
 			"smMethod": "PlanesTrialReceiveGrandPrizeResp"
 		}
 	],
-	"Pupil": [{
+	"Pupil": [
+		{
 			"key": "S_PUPIL_ENTER",
 			"comment": "进入门徒系统",
 			"cmMethod": "EnterPupilSystemReq",
@@ -5433,7 +5540,8 @@
 			"smMethod": "PupilExactSearchResp"
 		}
 	],
-	"Marriage": [{
+	"Marriage": [
+		{
 			"key": "S_PUPIL_MARRIAGE_USER_DATA_SYNC",
 			"comment": "结义用户数据同步",
 			"smMethod": "MarriageUserDataMsgSync"
@@ -5518,7 +5626,8 @@
 			"byteDecode": "MarriageRecordTempMsg"
 		}
 	],
-	"PupilRankActivity": [{
+	"PupilRankActivity": [
+		{
 			"comment": "PupilRankRankListMsg解析",
 			"byteDecode": "PupilRankRankListMsg"
 		},
@@ -5541,7 +5650,8 @@
 			"smMethod": "PupilRankDetailResp"
 		}
 	],
-	"RegressionActivity": [{
+	"RegressionActivity": [
+		{
 			"comment": "RegressionActivityConfig解析",
 			"byteDecode": "RegressionActivityConfig"
 		},
@@ -5576,7 +5686,8 @@
 			"smMethod": "RegressionSaveSelectItemResp"
 		}
 	],
-	"RuleTrial": [{
+	"RuleTrial": [
+		{
 			"key": "S_RULE_TRIAL_CHALLENGE",
 			"comment": "请求法则试炼挑战",
 			"cmMethod": "RuleTrialChallengeReq",
@@ -5595,7 +5706,8 @@
 			"smMethod": "RuleTrialMonsterAttrResp"
 		}
 	],
-	"SkyTrade": [{
+	"SkyTrade": [
+		{
 			"key": "S_SKY_TRADE_ENTER",
 			"comment": "进入活动",
 			"cmMethod": "SkyTradeEnterActivityReq",
@@ -5804,7 +5916,8 @@
 			"byteDecode": "SkyTradeConfigSync"
 		}
 	],
-	"TreasureBowl": [{
+	"TreasureBowl": [
+		{
 			"key": "S_TREASURE_BOWL_SIGN",
 			"comment": "疯狂聚宝盆签到",
 			"cmMethod": "ReqGetConditionReward",
@@ -5815,7 +5928,8 @@
 			"byteDecode": "TreasureBowlData"
 		}
 	],
-	"UnionHonorHall": [{
+	"UnionHonorHall": [
+		{
 			"key": "S_UNION_HONOR_HALL_ENTER",
 			"comment": "进入妖盟荣誉堂",
 			"cmMethod": "UnionHonorHallEnterReq",
@@ -5876,7 +5990,8 @@
 			"smMethod": "UnionHonorHallGetHonorRankResp"
 		}
 	],
-	"Universe": [{
+	"Universe": [
+		{
 			"key": "S_UNIVERSE_LEVEL_UP",
 			"comment": "小世界升级",
 			"cmMethod": "UniverseLevelUpReq",
@@ -5925,7 +6040,8 @@
 			"smMethod": "UniverseDrawTwiceResp"
 		}
 	],
-	"MountainSea": [{
+	"MountainSea": [
+		{
 			"key": "S_MOUNTAIN_SEA_ENTER",
 			"comment": "进入山海界面",
 			"cmMethod": "EnterMountainSeaReq",
@@ -5966,17 +6082,20 @@
 			"comment": "踢出队伍",
 			"cmMethod": "MountainSeaKickOutTeamReq",
 			"smMethod": "MountainSeaKickOutTeamRsp"
-		}, {
+		},
+		{
 			"key": "S_MOUNTAIN_SEA_APPLY_JOIN_TEAM_AGREE",
 			"comment": "同意申请",
 			"cmMethod": "MountainSeaApplyJoinTeamAgreeReq",
 			"smMethod": "MountainSeaApplyJoinTeamAgreeRsp"
-		}, {
+		},
+		{
 			"key": "S_MOUNTAIN_SEA_APPLY_JOIN_TEAM_REFUSED",
 			"comment": "一键拒绝",
 			"cmMethod": "MountainSeaApplyJoinTeamRefusedReq",
 			"smMethod": "MountainSeaApplyJoinTeamRefusedRsp"
-		}, {
+		},
+		{
 			"key": "S_MOUNTAIN_SEA_GET_TEAM_INFO",
 			"comment": "查找队伍",
 			"cmMethod": "MountainSeaGetTeamInfoReq",
@@ -6077,7 +6196,8 @@
 			"byteDecode": "MountainSeaRankTeamList"
 		}
 	],
-	"YueBao": [{
+	"YueBao": [
+		{
 			"key": "S_YUE_BAO_ENTER",
 			"comment": "仙玉宝府进入请求",
 			"cmMethod": "YueBaoEnterReq",
@@ -6101,7 +6221,8 @@
 			"smMethod": "YueBaoInteractResp"
 		}
 	],
-	"SkyWar": [{
+	"SkyWar": [
+		{
 			"key": "S_SKY_WAR_ENTER",
 			"comment": "进入征战诸天",
 			"cmMethod": "SkyWarEnterReq",
@@ -6173,7 +6294,8 @@
 			"smMethod": "SkyWarDataSync"
 		}
 	],
-	"Yard": [{
+	"Yard": [
+		{
 			"key": "S_YARDPB_ENTER",
 			"comment": "家园-进入",
 			"cmMethod": "YardEnterReq",
@@ -6380,7 +6502,8 @@
 			"smMethod": "YardReportResp"
 		}
 	],
-	"CastSwordActivity": [{
+	"CastSwordActivity": [
+		{
 			"key": "S_CASTSWORD_ENTER",
 			"comment": "进入铸剑界面",
 			"cmMethod": "CastSwordEnterReq",
@@ -6431,7 +6554,8 @@
 			"byteDecode": "CastSwordConfigSyncMsg"
 		}
 	],
-	"HolyLand": [{
+	"HolyLand": [
+		{
 			"key": "S_HOLY_LAND_BASE_INFO_LOAD",
 			"comment": "九幽争霸 活动基础数据",
 			"cmMethod": "HolyLandBaseInfoReqMsg",
@@ -6708,7 +6832,8 @@
 			"smMethod": "HolyLandGameOccupyCitySyncMsg"
 		}
 	],
-	"MagicShop": [{
+	"MagicShop": [
+		{
 			"comment": "ActivityMagicShopLoopPoolMsg解析",
 			"byteDecode": "ActivityMagicShopLoopPoolMsg"
 		},
@@ -6719,7 +6844,13 @@
 			"smMethod": "ActivityMagicShopLoopGetPoolDataResp"
 		}
 	],
-	"Profession": [{
+	"Profession": [
+		{
+			"key": "S_PROFESSION_SYNC_PLAYER_DATA",
+			"comment": "职业系统玩家数据同步",
+			"smMethod": "CareerPlayerDataMsg"
+		},
+		{
 			"key": "S_PROFESSION_SYNC_CHANGE_PROFRESSION",
 			"comment": "职业系统转职",
 			"cmMethod": "CareerSwitchCareerReq",

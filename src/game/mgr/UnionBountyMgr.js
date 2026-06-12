@@ -72,7 +72,7 @@ export default class UnionBountyMgr {
 
     // 押镖界面返回&启动押镖
     async UnionBountyOpenBountyEventResp(t) {
-        // 玩家数据同步
+        if (!t || !t.playerData) return;
         this.bountyTimes = t.playerData.bountyTimes;
         this.helpTimes = t.playerData.helpTimes;
 

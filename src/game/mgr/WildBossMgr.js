@@ -1,4 +1,4 @@
-import GameNetMgr from "#game/net/GameNetMgr.js";
+﻿import GameNetMgr from "#game/net/GameNetMgr.js";
 import Protocol from "#game/net/Protocol.js";
 import logger from "#utils/logger.js";
 import LoopMgr from "#game/common/LoopMgr.js";
@@ -11,6 +11,9 @@ export default class WildBossMgr {
         this.enabled = global.account.switch.wildBoss??true;                              // 默认开启
         this.AD_REWARD_DAILY_MAX_NUM = 6 + (PlayerAttributeMgr.isMonthCardVip ? 2 : 0);   // 每日最大领取次数
         this.AD_REWARD_CD = 1000;                                                         // 每次间隔时间
+        this.passId = 0;                                                                  // 当前通关妖王ID
+        this.getAdRewardTimes = 0;                                                        // 今日已领取广告奖励次数
+        this.lastAdRewardTime = 0;                                                        // 上次领取时间戳
         this.isProcessing = false;
     }
 
@@ -54,7 +57,7 @@ export default class WildBossMgr {
         }
         if (this.getAdRewardTimes < this.AD_REWARD_DAILY_MAX_NUM && now - this.lastAdRewardTime >= this.AD_REWARD_CD) {
             if (SystemUnlockMgr.PALACE) {
-                if (!PalaceMgr.inst.checkIsMiracle) {
+                if (!PalaceMgr.inst.checkIsMiracle()) {
                     logger.info("[挑战妖王管理] 仙宫未开启");
                     return;
                 }

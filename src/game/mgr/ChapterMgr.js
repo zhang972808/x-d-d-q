@@ -31,6 +31,12 @@ export default class ChapterMgr {
         LoopMgr.inst.remove(this);
     }
 
+    // 每日重置挑战次数
+    resetDaily() {
+        this.challenge = global.account.switch.challenge || 0;
+        logger.info(`[冒险管理] 每日挑战次数重置为 ${this.challenge}`);
+    }
+
     SyncData(t) {
         this.isSyncing = true;
         this.passStageId = t.passStageId || 0;
@@ -54,6 +60,13 @@ export default class ChapterMgr {
     }
 
     async loopUpdate() {
+        // 每日重置：检测到新的一天
+        const today = new Date(new Date().getTime() + 8 * 3600000).toISOString().slice(0, 10);
+        if (this._lastDay && this._lastDay !== today) {
+            this.resetDaily();
+        }
+        this._lastDay = today;
+
         if (!WorkFlowMgr.inst.canExecute("Challenge")) return;
         if (this.isProcessing || this.isSyncing) return;
         this.isProcessing = true;

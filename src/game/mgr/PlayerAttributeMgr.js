@@ -8,14 +8,30 @@ import AdRewardMgr from "#game/mgr/AdRewardMgr.js";
 import UnionMgr from "#game/mgr/UnionMgr.js";
 import WorkFlowMgr from "#game/common/WorkFlowMgr.js";
 
+// 主属性 → 神兽灵脉 skillId 映射
+const PRIMARY_ATTR_TO_BEAST_SKILL = {
+    6: 50005,  // 暴击 → 青龙
+    7: 50003,  // 连击 → 螣蛇
+    8: 50004,  // 闪避 → 勾陈
+    9: 50002,  // 反击 → 白虎
+};
+
 class Attribute {
     static Chop(times = 1) {
-        logger.debug(`[砍树] 砍树 ${times} 次`);
+        logger.info(`[砍树] 砍树 ${times} 次`);
 
         const separation = global.account.chopTree.separation;
-        let attr = separation.strictMode
-            ? [...new Set(separation.strictConditions.flatMap(condition => [...condition.primaryAttribute, ...condition.secondaryAttribute]))]
-            : separation.condition.flat();
+        const chopMode = global.account.chopTree?.chopMode || "strict";
+        let attr;
+        if (chopMode === "power") {
+            // 妖力模式：不筛选属性，所有属性都收
+            attr = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+        } else {
+            // 严格模式：按 condition 筛选
+            attr = separation.strictMode
+                ? [...new Set((separation.strictConditions || []).flatMap(condition => [...condition.primaryAttribute, ...condition.secondaryAttribute]))]
+                : (separation.condition || []).flat();
+        }
 
         return GameNetMgr.inst.sendPbMsg(Protocol.S_ATTRIBUTE_DREAM_MSG, { auto: true, attr: attr, times: times });
     }
@@ -25,7 +41,7 @@ class Attribute {
         return GameNetMgr.inst.sendPbMsg(Protocol.S_ATTRIBUTE_GET_UNDEAL_EQUIPMENT_MSG, {});
     }
 
-    static FetchSeparation() {
+        static FetchSeparation() {
         logger.debug(`获取分身数据`);
         return GameNetMgr.inst.sendPbMsg(Protocol.S_ATTRIBUTE_GET_SEPARATION_DATAA_MSG_LIST_REQ, {});
     }
@@ -46,7 +62,7 @@ class Attribute {
     }
 
     static RandomTalentReq(times) {
-        logger.debug(`[灵脉] 随机灵脉 ${times} 次`);
+        logger.info(`[灵脉] 随机灵脉 ${times} 次`);
         return GameNetMgr.inst.sendPbMsg(Protocol.S_TALENT_RANDOM_TALENT, { randomTimes: times });
     }
 
@@ -81,7 +97,8 @@ export default class PlayerAttributeMgr {
             1: "阳神",
             2: "阴身"
         };
-        this.useSeparationIdx = null;                               // 使用的分身
+        this.useSeparationIdx = null;                               // 当前服务器确认的分身
+        this.pendingSeparationIdx = null;                           // 正在请求切换到的分身
 
         // 仙树及砍树
         this.treeInitialized = false;                               // 树是否初始化
@@ -103,7 +120,6 @@ export default class PlayerAttributeMgr {
         this.talentCreateLevel = 1;                                 // 灵脉等级
         this.talentCreateTimes = 1;                                 // 砍灵脉次数
 
-        this.unDealTalentDataMsg = [];                              // 未处理灵脉数据
         this.talentEnabled = global.account.switch.talent || false; // 是否开启砍灵脉
         this.previousFlowerNum = 0;                                 // 用于存储上一次的灵脉花数量
         this.initFlowerNum = -1;                                    // 初灵脉花数量
@@ -116,8 +132,9 @@ export default class PlayerAttributeMgr {
     static isYearCardVip = false;   // 终身卡
     static level = 0;               // 玩家等级
     static littleType = 0;          // 小境界
-    static bigType = 0;             // 大境界 
+    static bigType = 0;             // 大境界
     static fightValue = 0;          // 妖力
+    static currentExp = "0";        // 当前修为
 
     static get inst() {
         if (!this._instance) {
@@ -136,7 +153,8 @@ export default class PlayerAttributeMgr {
 
     // 新增方法：手动设置分身
     setSeparationIdx(index) {
-        if (this.useSeparationIdx !== index) {
+        if (this.pendingSeparationIdx !== index && this.useSeparationIdx !== index) {
+            this.pendingSeparationIdx = index;
             logger.info(`[分身切换器] 至 ${this.separationNames[index]}`);
             Attribute.SwitchSeparation(index);
         }
@@ -154,6 +172,7 @@ export default class PlayerAttributeMgr {
         PlayerAttributeMgr.bigType = realms.bigType;
         PlayerAttributeMgr.level = t.realmsId;
         PlayerAttributeMgr.fightValue = t.fightValue;
+        PlayerAttributeMgr.currentExp = t.exp || "0";
         if (t.useSeparationIdx !== null) {
             this.useSeparationIdx = t.useSeparationIdx;
             this.separationFightValue[this.useSeparationIdx] = Number(t.fightValue);
@@ -185,6 +204,8 @@ export default class PlayerAttributeMgr {
         this.equipmentData[t.index] = t.equipmentList || [];
         this.talentData[t.index] = t.talentData || [];
         this.separationFightValue[t.index] = Number(t.fightValue) || 0;
+        this.useSeparationIdx = t.index;
+        this.pendingSeparationIdx = null;
     }
 
     // 209 处理装备
@@ -196,44 +217,78 @@ export default class PlayerAttributeMgr {
             }
 
             this.isProcessing = true;
-            this.unDealEquipmentDataMsg = t.undDealEquipmentDataMsg; // 就是这样写的...
+            this.unDealEquipmentDataMsg = t.undDealEquipmentDataMsg;
 
             const listResolve = [];
 
             for (let i = 0; i < this.unDealEquipmentDataMsg.length; i++) {
                 const equipment = this.unDealEquipmentDataMsg[i];
-                const u = equipment.unDealEquipmentData; // 该装备的未处理数据
-                const fightValue = Number(equipment.fightValue); // 装备该装备后的妖力值
-                const id = u.id; // 该装备的id
-                const quality = u.quality; // 该装备的品质
-                const level = u.level; // 该装备的等级
-                const attributeList = this.processAttributes(u.attributeList); // 使用转换后的属性列表
-                const equipmentId = u.equipmentId; // 该装备的装备id
+                const u = equipment.unDealEquipmentData;
+                const fightValue = Number(equipment.fightValue);
+                const id = u.id;
+                const quality = u.quality;
+                const level = u.level;
+                const attributeList = this.processAttributes(u.attributeList);
+                const equipmentId = u.equipmentId;
                 const equipmentData = DBMgr.inst.getEquipment(equipmentId);
                 const equipmentName = equipmentData.name;
                 const equipmentType = equipmentData.type - 1;
 
-                let processed = await this.processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue);
+                // 从 playerAttributeDataList 找出这件装备属于哪个分身
+                // equipment.playerAttributeDataList 是装备掉落时那个分身的属性数据
+                // 用它匹配已知的分身数据来找到对应的 index
+                const sepIndex = this.findSeparationForEquipment(equipment);
+
+                const processed = await this.processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue, sepIndex);
 
                 if (!processed) {
-                    logger.debug(`[装备] 分解 ${id} ${DBMgr.inst.getEquipmentQuality(quality)} ${equipmentName}`);
+                    logger.info(`[装备] 分解 ${id} ${DBMgr.inst.getEquipmentQuality(quality)} ${equipmentName}`);
                     listResolve.push(id);
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 }
             }
 
             if (listResolve.length > 0) {
                 Attribute.DealEquipmentEnum_Resolve(listResolve);
             }
+
+            if (this.unDealEquipmentDataMsg.length > 0) {
+                Attribute.FetchSeparation();
+            }
+
             this.isProcessing = false;
         }
+    }
+
+    // 通过装备附带的 playerAttributeDataList 匹配是哪个分身的
+    // 服务器在装备掉落时会带当时分身的属性数据，用来判断归属
+    findSeparationForEquipment(equipment) {
+        if (!equipment.playerAttributeDataList || equipment.playerAttributeDataList.length === 0) {
+            return this.useSeparationIdx; // 没数据就用当前分身
+        }
+        // 比较装备附带的属性数据跟哪个分身当前装备的属性最接近(按类型+值匹配)
+        // 最简单：取第一个属性的 type 跟掉落时 compare
+        const eqAttr = equipment.playerAttributeDataList[0];
+        if (!eqAttr) return this.useSeparationIdx;
+
+        // 用 basic 属性来匹配分身(不同分身的基础四维不同)
+        for (let idx = 0; idx < 3; idx++) {
+            const sepAttr = this.playerAttributeData[idx];
+            if (!sepAttr || sepAttr.length === 0) continue;
+            // 比较基础属性值是否相同
+            const match = sepAttr.some(a => a.type === eqAttr.type && String(a.value) === String(eqAttr.value));
+            if (match) return idx;
+        }
+        // 匹配不到就当前分身
+        return this.useSeparationIdx;
     }
 
     haveUnDealEquipment() {
         return this.unDealEquipmentDataMsg.length > 0
     }
 
-    async processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue) {
-        // 不支持未分身
+    async processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue, sepIndex) {
         if (!this.separation) return false;
 
         const showResult = global.account.chopTree.showResult || false;
@@ -243,37 +298,44 @@ export default class PlayerAttributeMgr {
         let originalEquipmentDesc;
         const newEquipmentDesc = `${DBMgr.inst.getEquipmentQuality(quality)} ${DBMgr.inst.getEquipmentName(equipmentId)} ${DBMgr.inst.getAttribute(attackType)}:${attributeList.attack.value / 10} ${DBMgr.inst.getAttribute(defenseType)}:${attributeList.defense.value / 10}`;
 
-        // 判断使用的条件类型
-        const conditions = rule.strictMode ? rule.strictConditions : rule.condition;
-        const { result, index } = this.checkMultipleConditions(attackType, [attackType, defenseType], conditions, rule.strictMode);
+        const chopMode = global.account.chopTree?.chopMode || "strict";
+        const index = (sepIndex !== undefined && sepIndex !== null) ? sepIndex : this.useSeparationIdx;
 
-        // 过滤掉不符合需求的装备
-        if (!result) return false;
+        // ====== 绝对妖力提升模式 ======
+        if (chopMode === "power") {
+            if (quality < rule.quality) return false;
+            if (this.separationFightValue[index] === undefined) return false;
 
+            const currentFight = this.separationFightValue[index] || 0;
+            if (fightValue > currentFight) {
+                logger.warn(`[装备-妖力] ${this.separationNames[index]} ${newEquipmentDesc} 妖力 ${fightValue} > 当前 ${currentFight}，穿上`);
+                this.separationFightValue[index] = fightValue;
+                Attribute.DealEquipmentEnum_EquipAndResolveOld(id);
+                return true;
+            }
+            return false;
+        }
+
+        // ====== 严格模式 ======
         let betterAttributes = false;
         let existingAttributeList = null;
         let existingExist = true;
 
-        // 如果分身没装备就直接穿上
-        if (!this.equipmentData[index][equipmentType]) {
+        // 分身这个部位没装备 → 直接穿上
+        if (!this.equipmentData[index] || !this.equipmentData[index][equipmentType]) {
             betterAttributes = true;
             existingExist = false;
             logger.warn(`[装备] 分身${this.separationNames[index]} 无原装备`);
-            // logger.warn(`${JSON.stringify(this.equipmentData[index])}`);
         } else {
-            // 分身装备属性转换
             existingAttributeList = this.processAttributes(this.equipmentData[index][equipmentType].attributeList);
             originalEquipmentDesc = `${DBMgr.inst.getEquipmentQuality(this.equipmentData[index][equipmentType].quality)} ${DBMgr.inst.getEquipmentName(this.equipmentData[index][equipmentType].equipmentId)} ${DBMgr.inst.getAttribute(existingAttributeList.attack.type)}:${existingAttributeList.attack.value / 10} ${DBMgr.inst.getAttribute(existingAttributeList.defense.type)}:${existingAttributeList.defense.value / 10}`;
         }
 
-        // 装备属性和等级判断
         if (!betterAttributes && quality >= rule.quality) {
             if (showResult) {
-                logger.debug(`[装备] 新装备的装备品质和属性符合，如换该装备，装备的妖力偏移为: ${fightValue - this.separationFightValue[index]} ,正为增加，负数为减低`);
-                logger.info(`[装备] 新装备品质符合：${newEquipmentDesc} 等级：${level} 与原装备对比 ${originalEquipmentDesc} 等级：${this.equipmentData[index][equipmentType].level}，如换该装备，妖力偏移：${fightValue - this.separationFightValue[index]}`);
+                logger.info(`[装备] ${this.separationNames[index]} 新装备品质符合：${newEquipmentDesc} 等级：${level} 与原装备对比 ${originalEquipmentDesc} 等级：${this.equipmentData[index][equipmentType].level}`);
             }
 
-            // 在 levelDiff 在 0 - levelOffset 范围内时进行线性插值计算，而在 levelDiff > levelOffset 时进行平方处理
             const levelOffset = rule.levelOffset || 5;
             const levelDiff = level - this.equipmentData[index][equipmentType].level;
             const lvLow = levelDiff > levelOffset;
@@ -287,99 +349,88 @@ export default class PlayerAttributeMgr {
             } else if (lvLow) {
                 offsetMultiplier = Math.pow(1 - tempOffset, 2);
             }
-
-            // 确保 offsetMultiplier 不会超过 1
             offsetMultiplier = Math.min(offsetMultiplier, 1);
 
-            logger.info(`[装备] ${attributeList.attack.value} 大于 ${existingAttributeList.attack.value} * ${offsetMultiplier} = ${existingAttributeList.attack.value * offsetMultiplier}`)
             if (level >= (this.equipmentData[index][equipmentType].level - 1) && parseFloat(attributeList.attack.value) >= parseFloat(existingAttributeList.attack.value) * offsetMultiplier) {
-                if (showResult) logger.error(`[装备] ${newEquipmentDesc} 等级${level} 大于 分身${this.separationNames[index]} ${this.equipmentData[index][equipmentType].level} 且攻击属性 ${attributeList.attack.value} 大于 ${existingAttributeList.attack.value} * ${offsetMultiplier} = ${existingAttributeList.attack.value * offsetMultiplier}`);
-                betterAttributes = true;
-            }
-
-            // 去掉当前身上不符合条件的装备
-            const primaryMatch = rule.strictMode ? conditions[index].primaryAttribute.includes(existingAttributeList.attack.type) : conditions[index].includes(existingAttributeList.attack.type);
-            const secondaryMatch = rule.strictMode ? conditions[index].secondaryAttribute.includes(existingAttributeList.defense.type) : true; // 非严格模式下忽略副属性
-            if (!(primaryMatch && secondaryMatch)) {
-                if (showResult) logger.error(`[装备] 分身${this.separationNames[index]} 已装备的主属性或副属性不符合期望`);
+                if (showResult) logger.warn(`[装备] ${this.separationNames[index]} ${newEquipmentDesc} 等级${level} ≥ ${this.equipmentData[index][equipmentType].level - 1} 且攻击 ${attributeList.attack.value} ≥ ${existingAttributeList.attack.value * offsetMultiplier}`);
                 betterAttributes = true;
             }
         }
 
-        // 无视品质 属性高于概率偏移值
+        // 无视品质：属性远高于概率偏移值
         if (existingExist && parseFloat(attributeList.attack.value) >= parseFloat(existingAttributeList.attack.value) * (1 + rule.probOffset)) {
-            if (showResult) logger.error(`[装备] ${newEquipmentDesc} 攻击属性 ${attributeList.attack.value} 大于 分身${this.separationNames[index]} ${existingAttributeList.attack.value} * ${1 + rule.probOffset} = ${existingAttributeList.attack.value * (1 + rule.probOffset)}`);
+            if (showResult) logger.warn(`[装备] ${this.separationNames[index]} ${newEquipmentDesc} 攻击远高于旧装`);
             betterAttributes = true;
         }
 
-        // 无视品质和属性偏移（首先是属性符合，不管属性比原来低还是高,只要妖力高就替换）
+        // 妖力优先模式
         const fightValueOffset = fightValue - this.separationFightValue[index];
         if (rule.fightValueFirst && quality >= rule.quality) {
             betterAttributes = (fightValueOffset > 0);
-
-            if(betterAttributes) logger.warn(`[装备] 开启妖力优先, 分身: ${this.separationNames[index]} 新装备 ${newEquipmentDesc}, 切换分身后装备后妖力提升: ${fightValueOffset}`);
+            if(betterAttributes) logger.warn(`[装备] ${this.separationNames[index]} 妖力优先, 妖力提升: ${fightValueOffset}`);
         }
 
         if (betterAttributes) {
             if (existingExist) {
-                logger.info(`[装备] 分身${this.separationNames[index]} 原装备 ${originalEquipmentDesc}`);
+                logger.info(`[装备] ${this.separationNames[index]} 旧装备 ${originalEquipmentDesc}`);
             }
-            logger.warn(`[装备] 分身${this.separationNames[index]} 新装备 ${newEquipmentDesc}, 该分身换装前妖力: ${this.separationFightValue[index]}, 换装后妖力偏移: ${fightValueOffset}`);
+            logger.warn(`[装备] ${this.separationNames[index]} → 新装备 ${newEquipmentDesc}, 妖力: ${this.separationFightValue[index]} → ${fightValue}`);
 
-            // 存储当前分身妖力，防止未切换，妖力未更新
             this.separationFightValue[index] = fightValue;
 
-            // 切换分身
-            this.setSeparationIdx(index)
+            // 切换到装备归属的分身再穿上
+            if (this.useSeparationIdx !== index) {
+                this.setSeparationIdx(index);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
             Attribute.DealEquipmentEnum_EquipAndResolveOld(id);
-            Attribute.FetchSeparation();
             return true;
         }
+
+        return false;
     }
 
     doChopTree() {
         const peachNum = BagMgr.inst.getGoodsNum(100004);
+        const chopMode = global.account.chopTree?.chopMode || "strict";
 
-        // 记录初始数量
-        if (this.initPeachNum == -1) {
-            this.initPeachNum = peachNum;
-        }
-
-        // 停止砍树的桃子数量
-        const stopNum = global.account.chopTree?.stop?.num ?? 50;
-        // 停止砍树的玩家等级
-        const stopLevel = (typeof global.account.chopTree?.stop?.level === 'string' && global.account.chopTree.stop.level.toLowerCase() === 'infinity') ? Infinity : (global.account.chopTree?.stop?.level || Infinity);
-        // 默认为不限制执行次数, 砍多少次就停
-        const doNum = (typeof global.account.chopTree?.stop?.doNum === 'string' && global.account.chopTree.stop.doNum.toLowerCase() === 'infinity') ? Infinity : (global.account.chopTree?.stop?.doNum || Infinity);
-
-        // 已经完成的砍树次数
+        if (this.initPeachNum == -1) this.initPeachNum = peachNum;
         const hasDoNum = this.initPeachNum - peachNum;
 
-        // 判断是否停止任务
-        if (peachNum <= stopNum || this.level <= stopLevel || hasDoNum >= doNum) {
+        const stopNum = global.account.chopTree?.stop?.num ?? (chopMode === "power" ? 0 : 50);
+        const stopLevel = chopMode === "power" ? Infinity :
+            ((typeof global.account.chopTree?.stop?.level === 'string' && global.account.chopTree.stop.level.toLowerCase() === 'infinity') ? Infinity : (global.account.chopTree?.stop?.level || Infinity));
+        const doNum = chopMode === "power" ? Infinity :
+            ((typeof global.account.chopTree?.stop?.doNum === 'string' && global.account.chopTree.stop.doNum.toLowerCase() === 'infinity') ? Infinity : (global.account.chopTree?.stop?.doNum || Infinity));
+
+        if (peachNum <= stopNum || (isFinite(stopLevel) && PlayerAttributeMgr.level <= stopLevel) || hasDoNum >= doNum) {
             logger.warn(`[砍树] 停止任务, 还剩余 ${peachNum} 桃子`);
             this.chopEnabled = false;
-
-            // 任务完成后切换为默认分身
             this.switchToDefaultSeparation();
             WorkFlowMgr.inst.remove("ChopTree");
+            logger.info("[砍树] 金色桃 5轮x20次");
+            for (var r = 0; r < 5; r++) {
+              for (var i = 0; i < 20; i++) {
+                GameNetMgr.inst.sendPbMsg(Protocol.S_GOLD_PEACH_CUT_TREE, {});
+              }
+            }
             return;
         }
 
-        // 更新上一次数量
         if (peachNum !== this.previousPeachNum) {
-            logger.info(`[砍树] 还剩 ${peachNum} 桃子`);
+            logger.info(`[砍树] 还剩 ${peachNum} 桃子, 当前分身=${this.separationNames[this.useSeparationIdx]}`);
             this.previousPeachNum = peachNum;
         }
+
+        // 直接砍树，不需要切换分身
+        // 服务器返回的装备数据里自带分身的 playerAttributeDataList 和 fightValue
         Attribute.Chop(this.chopTimes);
         Attribute.CheckUnfinishedEquipment();
 
-        // 当加入妖盟且砍了350颗桃后
-        if (UnionMgr.inst.inUnion && !this.doneUnionTask) {
-            if (hasDoNum >= 350) {
-                GameNetMgr.inst.sendPbMsg(Protocol.S_TASK_GET_REWARD, { taskId: [120001, 120002, 120003, 120004, 120005] });
-                this.doneUnionTask = true;
-            }
+        // 妖盟任务
+        if (UnionMgr.inst.inUnion && !this.doneUnionTask && hasDoNum >= 350) {
+            GameNetMgr.inst.sendPbMsg(Protocol.S_TASK_GET_REWARD, { taskId: [120001, 120002, 120003, 120004, 120005] });
+            this.doneUnionTask = true;
         }
     }
 
@@ -406,53 +457,6 @@ export default class PlayerAttributeMgr {
         }
 
         return attributes;
-    }
-
-    checkCondition(input, condition, strictMode = false) {
-        for (let i = 0; i < condition.length; i++) {
-            if (strictMode) {
-                // 严格模式下的条件
-                const primary = condition[i].primaryAttribute || [];
-                const secondary = condition[i].secondaryAttribute || [];
-
-                // 检查主属性和副属性是否在要求范围内
-                const primaryMatches = primary.includes(input.primary);
-                const secondaryMatches = input.secondary.some(attr => secondary.includes(attr));
-
-                if (primaryMatches && secondaryMatches) {
-                    return { result: true, index: i };
-                }
-            } else {
-                // 非严格模式下的条件判断
-                for (let j = 0; j < condition[i].length; j++) {
-                    const element = condition[i][j];
-                    if (Array.isArray(element) && Array.isArray(input) && input.length === element.length && input.every((val, index) => val === element[index])) {
-                        return { result: true, index: i };
-                    } else if (element === input) {
-                        return { result: true, index: i };
-                    }
-                }
-            }
-        }
-        return { result: false, index: -1 };
-    }
-
-    checkMultipleConditions(primaryType, attributeTypes, condition, strictMode = false) {
-        const input = strictMode ? {
-            primary: primaryType,
-            secondary: attributeTypes
-        } : primaryType;
-
-        let result = this.checkCondition(input, condition, strictMode);
-        if (result.result) {
-            return result;
-        }
-
-        if (!strictMode) {
-            result = this.checkCondition(attributeTypes, condition);
-        }
-
-        return result;
     }
 
     // 621 灵脉数据初始化
@@ -498,8 +502,11 @@ export default class PlayerAttributeMgr {
                 let processed = await this.processTalent(u, name);
 
                 if (!processed) {
-                    logger.debug(`[灵脉] 分解 ${name}`);
+                    logger.info(`[灵脉] 分解 ${name}`);
                     Attribute.DealTalentEnum_Resolve()
+                } else {
+                    // 灵脉装备触发了分身切换，等待服务器响应再处理下一个
+                    await new Promise(resolve => setTimeout(resolve, 2000));
                 }
             }
 
@@ -507,9 +514,24 @@ export default class PlayerAttributeMgr {
         }
     }
 
+    // 从砍树分身配置自动生成灵脉筛选条件
+    buildTalentCondition() {
+        const strictConditions = global.account.chopTree?.separation?.strictConditions || [];
+        return strictConditions.map((sc, i) => {
+            const primaryAttr = sc.primaryAttribute?.[0];
+            const beastSkillId = PRIMARY_ATTR_TO_BEAST_SKILL[primaryAttr];
+            return {
+                skillId: beastSkillId ? [beastSkillId] : [],
+                attribute: [4], // 敏捷
+                priority: i,
+            };
+        });
+    }
+
     async processTalent(u, name) {
         const showResult = global.account.talent.showResult || false;
         const separation = global.account.talent.separation;
+        const condition = this.buildTalentCondition();
 
         const quality = u.quality;       // 灵脉品质
         const talentType = u.type - 1;   // 灵脉类型 就是孔位 对应身体实际的需要减1
@@ -519,11 +541,14 @@ export default class PlayerAttributeMgr {
         // 判断是否为特殊灵脉
         let isSpecial = false;
         if ([2, 4, 8, 10].includes(talentType)) {
-
-            let skillIds = [...new Set(separation.condition.flatMap(condition => [...condition.skillId]))]
-            if (!skillIds.includes(u.skillId)) {
+            if (condition.length === 0) {
+                if (showResult) logger.info(`[灵脉] ${name} 特殊灵脉无筛选条件，跳过`);
+                return false;
+            }
+            let skillIds = [...new Set(condition.flatMap(c => [...c.skillId]))];
+            if (skillIds.length > 0 && !skillIds.includes(u.skillId)) {
                 logger.warn(`[灵脉] ${name} 特殊灵脉为${DBMgr.inst.getAttribute(u.skillId)} 不匹配`);
-                return false
+                return false;
             }
             isSpecial = true;
         }
@@ -536,7 +561,7 @@ export default class PlayerAttributeMgr {
             if (showResult) logger.info("[灵脉] 灵脉品质符合");
 
             // 符合哪个分身的条件
-            index = this.checkTalentCondition(u, separation.condition, isSpecial);
+            index = this.checkTalentCondition(u, condition, isSpecial);
             if (index == -1) {
                 if (showResult) logger.info(`[灵脉] 粗筛不符合条件`);
                 return false;
@@ -555,7 +580,7 @@ export default class PlayerAttributeMgr {
 
                 // 已装备的灵脉不符合条件 直接换新
                 const talentAttributes = this.talentData[index][talentType].attributeData.map(attr => parseInt(attr.type));
-                const requiredAttributes = separation.condition[index].attribute;
+                const requiredAttributes = condition[index].attribute;
                 const isMatching = requiredAttributes.every(attr => talentAttributes.includes(attr));
                 if (!isMatching) {
                     if (showResult) logger.info("[灵脉] 已装备的灵脉不符合条件 直接换新");
@@ -564,7 +589,7 @@ export default class PlayerAttributeMgr {
 
                 // 打分制比较需要比较的属性值
                 if (!betterAttributes) {
-                    betterAttributes = this.detailedCompareTalent(this.talentData[index][talentType].attributeData, u.attributeData, separation.condition[index].attribute);
+                    betterAttributes = this.detailedCompareTalent(this.talentData[index][talentType].attributeData, u.attributeData, condition[index].attribute);
                 }
             }
         }
@@ -586,33 +611,20 @@ export default class PlayerAttributeMgr {
     }
 
     detailedCompareTalent(oldAttr, newAttr, condition) {
-        let totalDifference = 0;
-
-        condition.forEach(attrType => {
-            const oldAttribute = oldAttr.find(attr => attr.type === attrType);
-            const newAttribute = newAttr.find(attr => attr.type === attrType);
-
-            const oldValue = oldAttribute ? parseInt(oldAttribute.value) : 0;
-            const newValue = newAttribute ? parseInt(newAttribute.value) : 0;
-
-            let weight = 1;  // 默认权重
-
-            if (oldValue > 0) {
-                let difference = (newValue - oldValue) / oldValue;
-
-                if (difference >= 0 && attrType === 4) {
-                    weight = 1.05;  // 太大会影响平衡
-                }
-
-                totalDifference += difference * weight;
-            }
-        });
-
-        // 返回累加差值是否大于 0，表示新值整体是否优于旧值
-        return totalDifference > 0;
+        // 只比较敏捷属性（type=4），敏捷提高就换
+        const oldAgility = oldAttr.find(attr => attr.type === 4);
+        const newAgility = newAttr.find(attr => attr.type === 4);
+        const oldValue = oldAgility ? parseInt(oldAgility.value) : 0;
+        const newValue = newAgility ? parseInt(newAgility.value) : 0;
+        logger.info(`[灵脉] 敏捷比较: 旧=${oldValue} 新=${newValue}`);
+        return newValue > oldValue;
     }
 
     checkTalentCondition(u, condition, isSpecial) {
+        if (!condition || condition.length === 0) {
+            return -1;
+        }
+
         const talentAttributes = u.attributeData.map(attr => parseInt(attr.type));
         const talentValues = u.attributeData.reduce((acc, attr) => {
             acc[attr.type] = parseInt(attr.value);
@@ -659,38 +671,17 @@ export default class PlayerAttributeMgr {
     doAutoTalent() {
         const flowerNum = BagMgr.inst.getGoodsNum(100007);
 
-        // 记录初始数量
-        if (this.initFlowerNum == -1) {
-            this.initFlowerNum = flowerNum;
-        }
-
-        // 停止数量
-        const stopNum = global.account.talent?.stop?.stopNum ?? this.talentCreateTimes;
-        // 默认为不限制执行次数, 砍多少次就停
-        const doNum = (typeof global.account.talent?.stop?.doNum === 'string' && global.account.talent.stop.doNum.toLowerCase() === 'infinity') ? Infinity : (global.account.talent?.stop?.doNum || Infinity);
-
-        // 已经完成的数量
-        const hasDoNum = this.initFlowerNum - flowerNum;
-        // 判断是否停止任务
-        if (flowerNum <= stopNum || hasDoNum >= doNum) {
-            logger.warn(`[灵脉] 停止任务, 还剩余 ${flowerNum} 先天灵草`);
+        // 有花就用，花没了就停
+        if (flowerNum <= 0) {
+            logger.warn(`[灵脉] 无先天灵草，停止任务`);
             this.talentEnabled = false;
-
-            // 任务完成后切换为默认分身
             this.switchToDefaultSeparation();
             WorkFlowMgr.inst.remove("Talent");
             return;
         }
 
-        // 更新上一次数量
-        if (flowerNum !== this.previousFlowerNum) {
-            logger.info(`[灵脉] 还剩 ${flowerNum} 灵脉花`);
-            this.previousFlowerNum = flowerNum;
-        }
-        let times = this.talentCreateTimes
-        if (flowerNum < this.talentCreateTimes) {
-            times = 1
-        }
+        logger.info(`[灵脉] 剩余 ${flowerNum} 先天灵草，继续激发`);
+        let times = Math.min(this.talentCreateTimes, flowerNum);
         Attribute.RandomTalentReq(times);
         Attribute.CheckUnfinishedTalent();
     }
@@ -698,13 +689,25 @@ export default class PlayerAttributeMgr {
     // 207 仙树初始化以及自动升级
     SyncTree(t) {
         if (!this.treeInitialized) {
-            this.getAdRewardTimes = t.freeSpeedUpTimes || 0;
-            this.dreamLvUpEndTime = parseInt(t.dreamLvUpEndTime, 10) || 0;
-            this.lastAdRewardTime = parseInt(t.freeSpeedUpCdEndTime, 10) || 0;
             this.treeInitialized = true;
         }
+        this.dreamLvUpEndTime = parseInt(t.dreamLvUpEndTime, 10) || 0;
+        this.getAdRewardTimes = t.freeSpeedUpTimes || 0;
+        this.lastAdRewardTime = parseInt(t.freeSpeedUpCdEndTime, 10) || 0;
         this.treeLevel = t.dreamLv;
         this.calculateMultiplier(this.treeLevel);
+    }
+
+    // 仙树升级响应处理
+    onTreeLvUpResp(t) {
+        if (t.ret !== 0) {
+            logger.warn(`[仙树] 升级失败 ret=${t.ret}`);
+            return;
+        }
+        if (t.dreamDataMsg) {
+            this.SyncTree(t.dreamDataMsg);
+            logger.info(`[仙树] 升级成功，当前等级 ${this.treeLevel}`);
+        }
     }
 
     calculateMultiplier(treeLevel) {
@@ -819,7 +822,7 @@ export default class PlayerAttributeMgr {
 
             // 分身不存在跳过后续任务
             if (!this.separation) {
-                logger.debug(`[获取分身] 未找到分身，跳过任务`);
+                logger.info(`[获取分身] 未找到分身，跳过砍树和灵脉任务`);
                 WorkFlowMgr.inst.remove("ChopTree");
                 WorkFlowMgr.inst.remove("Talent");
                 return;

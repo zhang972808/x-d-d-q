@@ -82,7 +82,7 @@ export default class UnionTreasureMgr {
     async loopUpdate() {
         if (this.isProcessing) return;
         this.isProcessing = true;
-        if (!this.inUnion) return;
+        if (!this.inUnion()) return;
         try {
             if (!this.callback){
                 GameNetMgr.inst.sendPbMsg(Protocol.S_UNION_TREASURE_ENTER, {});

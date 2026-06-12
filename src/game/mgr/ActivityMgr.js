@@ -116,6 +116,10 @@ export default class ActivityMgr {
     async RspGetActivityDetail(t) {
         const activitCommonData = t.activity;
 
+        if (!activitCommonData) {
+            return;
+        }
+
         // 同步活动数据
         this.actCommonDataMap[activitCommonData.activityId] = activitCommonData;
         this.actDetailConfigMap[activitCommonData.activityId] = activitCommonData.detailConfig;

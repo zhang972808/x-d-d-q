@@ -1,0 +1,51 @@
+package com.yq.msg.CityMsg;
+import "PackagesBase";
+
+message CareerSwitchCareerReq {
+}
+
+message CareerSwitchCareerResp {
+    required int32 ret = 1;
+}
+
+message CareerTrainReq {
+}
+
+message CareerTrainResp {
+    required int32 ret = 1;
+    optional CareerTalentNodeData maxTalentNode = 2;
+}
+
+message CareerBattleBossReq {
+    optional bool repeat = 1;
+}
+
+message CareerBattleBossResp {
+    required int32 ret = 1;
+    optional CareerBossData bossData = 2;
+    optional CareerTalentNodeData maxTalentNode = 3;
+}
+
+message CareerGetBossAttrReq {
+}
+
+message CareerGetBossAttrResp {
+    required int32 ret = 1;
+    optional int32 careerType = 2;
+    optional CareerTalentNodeData maxTalentNode = 3;
+    optional CareerBossData bossData = 4;
+}
+
+message CareerGetAttrMapReq {
+}
+
+message CareerGetAttrMapResp {
+    required int32 ret = 1;
+}
+
+message CareerGetPreTaskRewardReq {
+}
+
+message CareerGetPreTaskRewardResp {
+    required int32 ret = 1;
+}

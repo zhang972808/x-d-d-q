@@ -33,6 +33,8 @@ import SystemUnlockMgr from "#game/mgr/SystemUnlockMgr.js";
 import UnionBountyMgr from "#game/mgr/UnionBountyMgr.js";
 import DBMgr from "#game/common/DBMgr.js";
 import SkyWarMgr from "#game/mgr/SkyWarMgr.js";
+import TownDemonMgr from "#game/mgr/TownDemonMgr.js";
+import CareerMgr from "#game/mgr/CareerMgr.js";
 import MailRewardMgr from "#game/mgr/MailMgr.js";
 
 class MsgRecvMgr {
@@ -515,17 +517,63 @@ class MsgRecvMgr {
   //         EquipmentAdvanceMgr.inst.syncEquipmentData(t);
   //     }
 
-  // import TaskMgr from "#game/mgr/TaskMgr.js";
-  //     // 501 玩家登录任务数据下发
-  //     static TaskDataListMsg(t, e) {
-  //         if (e == Protocol.getProtocalIdRemainder(Protocol.S_TASK_DATA_SEND)) {
-  //             logger.debug("[MsgRecvMgr] 任务全量同步");
-  //             TaskMgr.inst.initTaskList(t);
-  //         } else {
-  //             logger.debug("[MsgRecvMgr] 任务增量同步");
-  //             TaskMgr.inst.syncTaskList(t);
-  //         }
-  //     }
+  // === 顶号通知 ===
+  static OtherLoginMsg(t) { GameNetMgr.inst.onKickedByPhone(); }
+
+  // === 任务管理 ===
+  static TaskDataListMsg(t, e) {
+    if (!t) return;
+    if (e == Protocol.getProtocalIdRemainder(Protocol.S_TASK_DATA_SEND)) {
+      logger.debug("[MsgRecvMgr] 任务全量同步");
+      TaskMgr.inst.initTaskList(t);
+    } else {
+      logger.debug("[MsgRecvMgr] 任务增量同步");
+      TaskMgr.inst.syncTaskList(t);
+    }
+  }
+  static TaskGetRewardRespMsg(t) {
+    if (!t) return;
+    logger.debug("[MsgRecvMgr] 任务奖励领取返回");
+    TaskMgr.inst.onGetRewardResp(t);
+  }
+
+  // === 斗法 ===
+  static GetBattleListResp(t) {
+    if (!t) return;
+    logger.debug("[MsgRecvMgr] 斗法对手列表");
+    BagMgr.inst.handleRankBattleList(t);
+  }
+  static RankBattleChallengeResp(t) {
+    if (!t) return;
+    logger.debug("[MsgRecvMgr] 斗法挑战结果");
+    BagMgr.inst.handleRankBattleResult(t);
+  }
+
+  // === 镇魔管理 ===
+  static TownDemonApplyDataSync(t) { if(!t)return; logger.debug("[镇魔]登录同步"); TownDemonMgr.inst.onApplyDataSync(t); }
+  static TownDemonTimeStampsDataSync(t) { if(!t)return; logger.debug("[镇魔]时间戳"); TownDemonMgr.inst.onTimeStampsSync(t); }
+  static TownDemonBaseInfoRespMsg(t) { if(!t)return; logger.debug("[镇魔]主界面"); TownDemonMgr.inst.onBaseInfoResp(t); }
+  static TownDemonBattleRespMsg(t) { if(!t)return; logger.debug("[镇魔]挑战结果"); TownDemonMgr.inst.onBattleResp(t); }
+  static TowerDemonGetAchieveInfoRespMsg(t) { if(!t)return; logger.debug("[镇魔]成就"); TownDemonMgr.inst.onAchieveInfoResp(t); }
+  static TownDemonAchieveRewardRespMsg(t) { if(!t)return; logger.debug("[镇魔]成就奖励"); TownDemonMgr.inst.onAchieveRewardResp(t); }
+  static TownDemonGetRewardInfoRespMsg(t) { if(!t)return; logger.debug("[镇魔]排行信息"); TownDemonMgr.inst.onRewardInfoResp(t); }
+  static TownDemonGetRankRewardRespMsg(t) { if(!t)return; logger.debug("[镇魔]排行奖励"); TownDemonMgr.inst.onRankRewardResp(t); }
+
+  // === 宗门管理 ===
+  static PupilSystemLoginSync(t) { if(!t)return; logger.debug("[MsgRecvMgr]宗门登录"); PupilMgr.inst.checkReward(t); }
+  static EnterPupilSystemResp(t) { if(!t)return; logger.debug("[MsgRecvMgr]进入宗门"); PupilMgr.inst.checkGraduatation(t); }
+  static PupilGraduateResp(t) { if(t.ret===0)logger.info("[宗门]出师成功");else logger.warn("[宗门]出师失败"); }
+  static PupilRecruitResp(t) { if(t.ret===0)logger.info("[宗门]招募成功");else logger.warn("[宗门]招募失败"); }
+  static PupilTrainResp(t) { if(t.ret===0)logger.debug("[宗门]锤炼成功");else logger.warn("[宗门]锤炼失败"); }
+
+  // === 道途管理 ===
+  static CareerPlayerDataMsg(t) { if(!t)return; logger.debug("[MsgRecvMgr]道途数据"); CareerMgr.inst.onPlayerDataSync(t); }
+  static CareerTrainResp(t) { if(!t)return; logger.debug("[MsgRecvMgr]道途修行"); CareerMgr.inst.onTrainResp(t); }
+  static CareerBattleBossResp(t) { if(!t)return; logger.debug("[MsgRecvMgr]道途boss"); CareerMgr.inst.onBattleBossResp(t); }
+  static CareerGetBossAttrResp(t) { if(!t)return; logger.debug("[MsgRecvMgr]道途属性"); CareerMgr.inst.onBossAttrResp(t); }
+  static CareerGetPreTaskRewardResp(t) { if(!t)return; logger.debug("[MsgRecvMgr]任务奖励"); CareerMgr.inst.onPreTaskRewardResp(t); }
+  static CareerSwitchCareerResp(t) { if(!t)return; logger.debug("[MsgRecvMgr]切换道途"); CareerMgr.inst.onSwitchCareerResp(t); }
+  static CareerGetAttrMapResp(t) { if(!t)return; logger.debug("[MsgRecvMgr]属性映射"); CareerMgr.inst.onGetAttrMapResp(t); }
 }
 
 export default MsgRecvMgr;

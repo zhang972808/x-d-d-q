@@ -37,6 +37,12 @@ export default class TowerMgr {
         LoopMgr.inst.remove(this);
     }
 
+    // 每日重置挑战次数
+    resetDaily() {
+        this.challenge = global.account.switch.challenge || 0;
+        logger.info(`[镇妖塔管理] 每日挑战次数重置为 ${this.challenge}`);
+    }
+
     SyncData(t) {
         this.isSyncing = true;
         this.data = t || {};
@@ -73,7 +79,7 @@ export default class TowerMgr {
     processReward() {
         if (this.data.curPassId == 0) {
             if (SystemUnlockMgr.PALACE) {
-                if (!PalaceMgr.inst.checkIsMiracle) {
+                if (!PalaceMgr.inst.checkIsMiracle()) {
                     return;
                 }
             }
@@ -95,6 +101,13 @@ export default class TowerMgr {
     }
 
     async loopUpdate() {
+        const today = new Date(new Date().getTime() + 8 * 3600000).toISOString().slice(0, 10);
+        if (this._lastDay && this._lastDay !== today) {
+            this.resetDaily();
+            this.hasReward = false;
+        }
+        this._lastDay = today;
+
         if (!this.hasReward) this.processReward();
         if (!WorkFlowMgr.inst.canExecute("Challenge")) return;
         if (this.isProcessing || this.isSyncing) return;

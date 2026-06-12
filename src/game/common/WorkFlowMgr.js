@@ -7,11 +7,12 @@ export default class WorkFlowMgr {
         this.sortedQueue = []; // 缓存排序后的队列
 
         this.priorityDict = {
-            "ChopTree": 0,       // 最高优先级
-            "Talent": 1,         // 1级项目
-            "Invade": 2,         // 2级项目 异兽入侵
-            "SkyWar": 3,         // 3级项目 征战诸天  
-            "Challenge": 4,      // 4级项目 ChapterMgr/ SecretTowerMgr / TowerMgr
+            "Challenge": 0,      // 最高优先级 - 每天6-8点推图/镇妖塔/真火
+            "ChopTree": 1,       // 1级项目
+            "Talent": 2,         // 2级项目
+            "Invade": 3,         // 3级项目 异兽入侵
+            "HolyLand": 4,       // 4级项目 幽冥战场(九幽争霸)
+            "SkyWar": 5,         // 5级项目 征战诸天
         };
     }
 
@@ -42,35 +43,81 @@ export default class WorkFlowMgr {
     }
 
     start() {
-        // 添加0级项目
+        // 添加1级项目
         const ChopTree = global.account.switch.chopTree || false;
         if (ChopTree) {
             logger.info("[顺序管理] 已开启砍树");
             this.add("ChopTree");
         }
-        // 添加1级项目
+        // 添加2级项目
         const Talent = global.account.switch.talent || false;
         if (Talent) {
             logger.info("[顺序管理] 已开启砍灵脉");
             this.add("Talent");
         }
-        // 添加2级项目
+        // 添加3级项目
         const Invade = global.account.switch.invade || false;
         if (Invade) {
             logger.info("[顺序管理] 已开启自动异兽入侵");
             this.add("Invade");
         }
-        // 添加3级项目
+        // 添加4级项目：征战诸天
         const SkyWar = global.account.switch.skywar ?? false;
         if (SkyWar) {
             logger.info("[顺序管理] 已开启自动征战诸天");
             this.add("SkyWar");
         }
-        // 添加4级项目
-        const challenge = global.account.switch.challenge || 0;
-        if (challenge > 0) {
-            logger.info("[顺序管理] 已开启自动闯关");
-            this.add("Challenge");
+        // 0级项目（挑战）：只在天时间窗口内添加
+        // 不在 start() 加了，由 checkSchedule() 统一管理
+    }
+
+    // 获取当前北京时间的小时
+    getBeijingHour() {
+        const now = new Date();
+        return (now.getUTCHours() + 8) % 24;
+    }
+
+    // 获取今天日期（北京时间）
+    getBeijingDay() {
+        const now = new Date();
+        return new Date(now.getTime() + 8 * 3600000).toISOString().slice(0, 10);
+    }
+
+    // 检查时间窗口：从配置读取起止小时（默认 6:00 ~ 8:00）
+    isInChallengeWindow() {
+        const hour = this.getBeijingHour();
+        const start = global.account.switch.challengeWindowStart ?? 6;
+        const end = global.account.switch.challengeWindowEnd ?? 8;
+        return hour >= start && hour < end;
+    }
+
+    // 定时调度：每秒检查一次
+    checkSchedule() {
+        const challengeCfg = global.account.switch.challenge || 0;
+        if (challengeCfg <= 0) return;
+
+        const today = this.getBeijingDay();
+
+        // 每天首次进入窗口时，重置每日挑战次数
+        if (this._lastChallengeDay !== today) {
+            this._lastChallengeDay = today;
+            logger.info("[顺序管理] 📅 新的一天，挑战次数已重置");
+        }
+
+        if (this.isInChallengeWindow()) {
+            if (!this.queue.includes("Challenge")) {
+                const start = global.account.switch.challengeWindowStart ?? 6;
+                const end = global.account.switch.challengeWindowEnd ?? 8;
+                logger.info(`[顺序管理] ⏰ 进入${start}-${end}点挑战窗口，开启自动挑战`);
+                this.add("Challenge");
+            }
+        } else {
+            if (this.queue.includes("Challenge")) {
+                const start = global.account.switch.challengeWindowStart ?? 6;
+                const end = global.account.switch.challengeWindowEnd ?? 8;
+                logger.info(`[顺序管理] ⏰ 超出${start}-${end}点挑战窗口，暂停自动挑战`);
+                this.remove("Challenge");
+            }
         }
     }
 

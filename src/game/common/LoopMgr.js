@@ -28,9 +28,13 @@ import ChapterMgr from "#game/mgr/ChapterMgr.js";
 import TowerMgr from "#game/mgr/TowerMgr.js";
 import SecretTowerMgr from "#game/mgr/SecretTowerMgr.js";
 import CustomMgr from "#game/mgr/CustomMgr.js";
+import HeroRankMgr from "#game/mgr/HeroRankMgr.js";
 import ActivityMgr from "#game/mgr/ActivityMgr.js";
 import BagMgr from "#game/mgr/BagMgr.js";
 import DestinyMgr from "#game/mgr/DestinyMgr.js";
+import TownDemonMgr from "#game/mgr/TownDemonMgr.js";
+import TaskMgr from "#game/mgr/TaskMgr.js";
+import CareerMgr from "#game/mgr/CareerMgr.js";
 
 class LoopMgr {
 
@@ -64,6 +68,7 @@ class LoopMgr {
         this.add(PetMgr.inst);
         this.add(PetKernelMgr.inst);
         this.add(InvadeMgr.inst);
+        this.add(HeroRankMgr.inst);
         this.add(SkyWarMgr.inst);
         this.add(StarTrialMgr.inst);
         this.add(RuleTrialMgr.inst);
@@ -89,6 +94,9 @@ class LoopMgr {
         this.add(TowerMgr.inst, true);
         this.add(SecretTowerMgr.inst, true);
         this.add(ActivityMgr.inst, true);
+        this.add(TownDemonMgr.inst, true);
+        this.add(TaskMgr.inst, true);
+        this.add(CareerMgr.inst, true);
     }
 
     start() {
@@ -139,6 +147,9 @@ class LoopMgr {
 
         // 日常任务循环
         this.loopTaskIntervalTimeId = setInterval(() => {
+            // 检查时间调度（如6-8点推图窗口）
+            WorkFlowMgr.inst.checkSchedule();
+
             this.loopTaskList.forEach(item => {
                 if (item && typeof item.loopUpdate === 'function') {
                     item.loopUpdate();

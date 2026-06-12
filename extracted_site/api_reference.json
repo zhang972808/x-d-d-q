@@ -1,0 +1,140 @@
+{
+  "baseUrl": "https://xddq.sea666.cn",
+  "auth": {
+    "login": { "method": "POST", "url": "/api/auth/login", "desc": "登录接口" },
+    "register": { "method": "POST", "url": "/api/auth/register", "desc": "注册接口" },
+    "reset": { "method": "POST", "url": "/api/auth/reset", "desc": "找回账号" }
+  },
+  "channels": {
+    "qq": {
+      "servers": { "method": "GET", "url": "/api/chan/qq/servers", "desc": "QQ渠道获取37服务器列表", "params": "username, password" },
+      "login": { "method": "POST", "url": "/api/chan/qq/", "desc": "QQ渠道登录/绑定" },
+      "updateToken": { "method": "POST", "url": "/api/chan/qq/{id}/token", "desc": "更新子账号token和昵称" }
+    },
+    "douyin": {
+      "info": { "method": "GET", "url": "/api/chan/douyin/", "desc": "抖音渠道信息" },
+      "verify": { "method": "GET", "url": "/api/chan/douyin/{code}/verify", "desc": "抖音渠道验证token" },
+      "servers": { "method": "GET", "url": "/api/chan/douyin/{code}/servers", "desc": "抖音获取服务器列表" }
+    },
+    "vivo": {
+      "captcha": { "method": "GET", "url": "/api/chan/vivo/captcha", "desc": "vivo获取滑块验证码" },
+      "captchaSolve": { "method": "POST", "url": "/api/chan/vivo/captcha/solve", "desc": "vivo提交滑块验证码" },
+      "smsCode": { "method": "POST", "url": "/api/chan/vivo/sms-code", "desc": "vivo发送短信验证码" },
+      "fastLogin": { "method": "POST", "url": "/api/chan/vivo/fast-login", "desc": "vivo二次验证通过后快速登录获取服务器列表" },
+      "verifyIdcard": { "method": "POST", "url": "/api/chan/vivo/verify-idcard", "desc": "vivo二次验证：提交身份证后六位" },
+      "selectSub": { "method": "POST", "url": "/api/chan/vivo/select-sub", "desc": "vivo选择子账号完成游戏登录" },
+      "phoneServers": { "method": "GET", "url": "/api/chan/vivo/phone-servers", "desc": "vivo手机号验证码登录获取服务器列表" },
+      "saveToken": { "method": "PUT", "url": "/api/chan/vivo/", "desc": "保存vivo重新登录后的新token" },
+      "updateSubToken": { "method": "POST", "url": "/api/chan/vivo/{id}/token", "desc": "更新vivo子账号token" }
+    },
+    "oppo": {
+      "smsCode": { "method": "POST", "url": "/api/chan-oppo/sms-code", "desc": "OPPO发送短信验证码" },
+      "phoneServers": { "method": "GET", "url": "/api/chan-oppo/phone-servers", "desc": "OPPO手机号验证码登录获取服务器列表" },
+      "login": { "method": "POST", "url": "/api/chan-oppo/", "desc": "OPPO渠道登录" },
+      "saveToken": { "method": "PUT", "url": "/api/chan-oppo/{id}/token", "desc": "保存OPPO token" },
+      "updateSubToken": { "method": "POST", "url": "/api/chan-oppo/{id}/token", "desc": "更新OPPO子账号token" }
+    },
+    "xiaomi": {
+      "servers": { "method": "GET", "url": "/api/chan/xiaomi/servers", "desc": "小米渠道获取服务器列表" },
+      "smsCode": { "method": "POST", "url": "/api/chan/xiaomi/sms-code", "desc": "小米发送短信验证码" },
+      "phoneServers": { "method": "GET", "url": "/api/chan/xiaomi/phone-servers", "desc": "小米手机号验证码登录获取服务器列表" },
+      "login": { "method": "POST", "url": "/api/chan/xiaomi/", "desc": "小米渠道登录" },
+      "saveToken": { "method": "PUT", "url": "/api/chan/xiaomi/{id}/token", "desc": "保存小米token" },
+      "updateSubToken": { "method": "POST", "url": "/api/chan/xiaomi/{id}/token", "desc": "更新小米子账号token" }
+    },
+    "alipay": {
+      "verify": { "method": "GET", "url": "/api/chan/zfb/{code}/verify", "desc": "支付宝渠道验证token" },
+      "updateSubToken": { "method": "POST", "url": "/api/chan/zfb/{id}/token", "desc": "更新支付包子账号token" }
+    },
+    "app": {
+      "servers": { "method": "GET", "url": "/api/chan/app/servers", "desc": "APP渠道获取37服务器列表" },
+      "login": { "method": "POST", "url": "/api/chan/app/", "desc": "APP渠道登录" },
+      "updateSubToken": { "method": "POST", "url": "/api/chan/app/{id}/token", "desc": "更新APP子账号token" }
+    },
+    "common": {
+      "qrCode": { "method": "GET", "url": "/api/chan/{channel}/qr", "desc": "获取渠道二维码" },
+      "validateQr": { "method": "GET", "url": "/api/chan/{channel}/valid", "desc": "验证渠道二维码" },
+      "servers": { "method": "GET", "url": "/api/chan/{channel}/servers", "desc": "获取渠道服务器列表" },
+      "updateToken": { "method": "POST", "url": "/api/chan/{channel}/{id}/token", "desc": "更新渠道子账号token", "params": "code/token, purpose" }
+    }
+  },
+  "kubernetes": {
+    "run": { "method": "POST", "url": "/api/kubernetes/run", "desc": "创建容器资源" },
+    "stop": { "method": "POST", "url": "/api/kubernetes/stop", "desc": "删除容器资源" },
+    "queuePosition": { "method": "GET", "url": "/api/kubernetes/queue-position", "desc": "排队位置查询" },
+    "logStreamPoll": { "method": "GET", "url": "/api/kubernetes/log-stream-poll", "desc": "日志轮询" }
+  },
+  "subUser": {
+    "list": { "method": "GET", "url": "/api/user/sub-users", "desc": "获取子账户列表" },
+    "detail": { "method": "GET", "url": "/api/sub-user/{id}", "desc": "获取子账号详情" },
+    "create": { "method": "POST", "url": "/api/sub-user/", "desc": "创建子账号" },
+    "update": { "method": "PUT", "url": "/api/sub-user/{id}", "desc": "更新子账号" },
+    "delete": { "method": "DELETE", "url": "/api/sub-user/{id}", "desc": "删除子账号" },
+    "bind": { "method": "POST", "url": "/api/sub-user/bind", "desc": "绑定子账号" },
+    "getSetting": { "method": "GET", "url": "/api/sub-user/{id}/setting", "desc": "获取子账号游戏配置" },
+    "saveSetting": { "method": "PUT", "url": "/api/sub-user/{id}/setting", "desc": "保存子账号游戏配置" },
+    "importSetting": { "method": "POST", "url": "/api/sub-user/{id}/setting/import", "desc": "导入子账号游戏配置" },
+    "changePassword": { "method": "PUT", "url": "/api/sub-user/{id}/password", "desc": "修改子账号密码" },
+    "trial": { "method": "POST", "url": "/api/sub-user/{id}/exp", "desc": "开通试用" },
+    "deleteRecords": { "method": "GET", "url": "/api/sub-user/delete-records", "desc": "获取子账号删除记录" }
+  },
+  "user": {
+    "inviteCode": { "method": "GET", "url": "/api/user/invite-code", "desc": "获取邀请码" },
+    "quota": { "method": "GET", "url": "/api/user/quota", "desc": "获取用户配额" },
+    "stats": { "method": "GET", "url": "/api/user/stats", "desc": "获取统计指标" },
+    "changePassword": { "method": "PUT", "url": "/api/user/password", "desc": "修改密码" },
+    "setSecondaryPwd": { "method": "PUT", "url": "/api/user/secondary-password", "desc": "设置二级密码" },
+    "resetSecondaryPwd": { "method": "DELETE", "url": "/api/user/secondary-password", "desc": "申请重置二级密码" },
+    "verifySecondaryPwd": { "method": "POST", "url": "/api/user/secondary-password/verify", "desc": "验证二级密码" },
+    "assignRecord": { "method": "POST", "url": "/api/user/assign/record", "desc": "配额分配记录" }
+  },
+  "ticket": {
+    "myList": { "method": "GET", "url": "/api/ticket", "desc": "获取我的工单" },
+    "detail": { "method": "GET", "url": "/api/ticket/{id}", "desc": "获取工单详情" },
+    "create": { "method": "POST", "url": "/api/ticket", "desc": "提交工单" },
+    "update": { "method": "PUT", "url": "/api/ticket/{id}", "desc": "更新工单" },
+    "reply": { "method": "POST", "url": "/api/ticket/{id}", "desc": "回复工单" },
+    "close": { "method": "PUT", "url": "/api/ticket/{id}/close", "desc": "办结工单" }
+  },
+  "admin": {
+    "userList": { "method": "GET", "url": "/api/admin/user/list", "desc": "获取账户列表" },
+    "updateUser": { "method": "PUT", "url": "/api/admin/user/{id}", "desc": "修改主账户状态" },
+    "deleteUser": { "method": "DELETE", "url": "/api/admin/user/{id}", "desc": "删除主账户" },
+    "orders": { "method": "GET", "url": "/api/admin/orders", "desc": "获取订单列表" },
+    "stats": { "method": "GET", "url": "/api/admin/stats", "desc": "获取数据统计" },
+    "agentStats": { "method": "GET", "url": "/api/admin/agent/stats", "desc": "获取代理盈利统计" },
+    "agentTransfer": { "method": "POST", "url": "/api/admin/agent/transfer-stats", "desc": "代理归属转移" },
+    "assignRecord": { "method": "POST", "url": "/api/admin/assign/record", "desc": "配额分配记录" },
+    "auditLogs": { "method": "GET", "url": "/api/admin/audit-logs", "desc": "子账户审计日志" },
+    "monthlyRevenue": { "method": "GET", "url": "/api/admin/monthly-revenue", "desc": "获取月度收入" },
+    "notices": { "method": "GET", "url": "/api/admin/notices", "desc": "获取公告列表" },
+    "createNotice": { "method": "POST", "url": "/api/admin/notice", "desc": "发布公告" },
+    "deleteNotice": { "method": "DELETE", "url": "/api/admin/notice", "desc": "删除公告" },
+    "refund": { "method": "POST", "url": "/api/admin/refund", "desc": "处理用户退款" },
+    "refundOnly": { "method": "POST", "url": "/api/admin/refund-only", "desc": "仅退款" },
+    "maintenance": { "method": "POST", "url": "/api/admin/maintenance/status", "desc": "设置维护模式" },
+    "version": { "method": "GET", "url": "/api/admin/version", "desc": "获取版本信息" },
+    "updateVersion": { "method": "POST", "url": "/api/admin/version", "desc": "更新版本信息" },
+    "ticketList": { "method": "GET", "url": "/api/admin/ticket", "desc": "管理端工单列表" },
+    "ticketDetail": { "method": "GET", "url": "/api/admin/ticket/{id}", "desc": "管理端工单详情" },
+    "replyTicket": { "method": "POST", "url": "/api/admin/ticket/{id}", "desc": "回复工单" },
+    "deleteTicket": { "method": "DELETE", "url": "/api/admin/ticket/{id}", "desc": "删除工单" },
+    "batchDeleteTicket": { "method": "DELETE", "url": "/api/admin/ticket/batch", "desc": "批量删除工单" },
+    "subPod": { "method": "GET", "url": "/api/admin/sub-pod", "desc": "获取启动pod数量" },
+    "nodeMetrics": { "method": "GET", "url": "/api/admin/node-metrics", "desc": "容器节点流" },
+    "subUsers": { "method": "GET", "url": "/api/admin/sub-users", "desc": "获取子账户列表" }
+  },
+  "common": {
+    "status": { "method": "POST", "url": "/api/common/status", "desc": "获取容器状态" },
+    "notice": { "method": "GET", "url": "/api/common/notice/{id}", "desc": "获取公告" },
+    "maintenanceStatus": { "method": "GET", "url": "/api/maintenance/status", "desc": "维护模式" }
+  },
+  "payment": {
+    "create": { "method": "POST", "url": "/api/payment/create", "desc": "创建支付" },
+    "query": { "method": "GET", "url": "/api/payment/query/{id}", "desc": "查询支付" }
+  },
+  "redemption": {
+    "submit": { "method": "POST", "url": "/api/redemption/submit", "desc": "提交兑换码" },
+    "winners": { "method": "GET", "url": "/api/redemption/winners", "desc": "获取获奖名单" }
+  }
+}

@@ -116,6 +116,12 @@ class GameNetMgr {
     this.sendPbMsg(Protocol.S_PLAYER_LOGIN, loginData);
   }
 
+  // 被手机顶号
+  onKickedByPhone() {
+    this.kickedByPhone = true;
+    logger.warn("[GameNetMgr] 账号被手机顶号，重连时将等待配置的间隔时间");
+  }
+
   ping() {
     this.sendPbMsg(Protocol.S_PLAYER_PING, true);
   }

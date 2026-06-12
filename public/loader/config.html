@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>游戏配置</title>
+  <link rel="stylesheet" href="../css/app.css?v=4"/>
+  <link rel="shortcut icon" type="image/x-icon" href="../assets/favicon.ico"/>
+  <style>
+    body { background: var(--bg-primary); display: block; padding: 0; }
+    .container { background: transparent; box-shadow: none; max-width: 1050px; margin: 0 auto; padding: 1.5rem 2rem; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .button-container { display: flex; gap: 0.75rem; justify-content: center; margin-top: 2rem; }
+    .sub-form-group { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .sub-form-group label { white-space: nowrap; min-width: 120px; font-size: 0.8rem; color: var(--text-secondary); }
+    .sub-form-group input { width: 160px; }
+    .sub-form-group select { width: auto; }
+    .form-inline { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; }
+    .form-inline .form-group { flex: 0 0 auto; }
+    .help-text { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .config-row { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .config-col { flex: 1; min-width: 300px; }
+    .tag-group { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .tag-item { padding: 0.3rem 0.7rem; background: rgba(108,92,231,0.1); border: 1px solid rgba(108,92,231,0.2); border-radius: 1rem; font-size: 0.78rem; color: var(--accent2); cursor: pointer; transition: var(--transition); }
+    .tag-item:hover { background: rgba(108,92,231,0.2); }
+    .tag-item.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="bg-particles" id="particles"></div>
+  <div class="container config-page">
+    <div class="app-header"><h1>⚙ 游戏配置</h1></div>
+
+    <div class="tabs" id="tabBar">
+      <button class="tab active" data-tab="general">基本设置</button>
+      <button class="tab" data-tab="homeland">福地规则</button>
+      <button class="tab" data-tab="switches">功能开关</button>
+      <button class="tab" data-tab="choptree">砍树设置</button>
+      <button class="tab" data-tab="talent">灵脉设置</button>
+      <button class="tab" data-tab="holyLand">九幽争霸</button>
+      <button class="tab" data-tab="pet">灵兽设置</button>
+    </div>
+
+    <!-- ============ 基本设置 ============ -->
+    <div id="generalTab" class="tab-content active">
+      <div class="config-section">
+        <h3>账号信息 <span style="font-weight:400;color:var(--text-muted);margin-left:8px">（编辑请回到控制台修改账号信息）</span></h3>
+        <div class="form-inline">
+          <div class="form-group"><label>昵称</label><input type="text" id="nickName" disabled/></div>
+          <div class="form-group"><label>服务器ID</label><input type="text" id="cfg_serverId" disabled/></div>
+          <div class="form-group"><label>游戏账号</label><input type="text" id="cfg_username" disabled/></div>
+          <div class="form-group"><label>Token</label><input type="text" id="cfg_token" disabled style="width:260px"/></div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>连接设置</h3>
+        <div class="form-inline">
+          <div class="form-group"><label>登录Token验证（为空不验证）</label><input type="text" id="loginToken"/></div>
+          <div class="form-group"><label>最大重连次数（infinity=无限）</label><input type="text" id="maxRetries"/></div>
+          <div class="form-group"><label>启动延迟(毫秒)</label><input type="number" id="startupDelay"/></div>
+          <div class="form-group"><label>重连间隔(毫秒)</label><input type="number" id="reconnectInterval"/></div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>妖盟商店</h3>
+        <div class="form-inline">
+          <div class="form-group"><label>砍价人数偏移量</label><input type="number" id="unionBargainNum"/><p class="help-text">还剩多少人没砍完就购买</p></div>
+          <div class="form-group"><label>砍价价格偏移量</label><input type="number" id="unionBargainPrice"/><p class="help-text">砍到多少价格以下自动购买</p></div>
+        </div>
+        <h4 style="margin-top:1rem">购买商品列表</h4>
+        <div id="buyUnionGoodLists" class="checkbox-group">
+          <label><input type="checkbox" value="230000011"/><span>免费仙桃</span></label>
+          <label><input type="checkbox" value="230000001"/><span>小仙桃</span></label>
+          <label><input type="checkbox" value="230000002"/><span>大仙桃</span></label>
+          <label><input type="checkbox" value="230000003"/><span>小灵兽果</span></label>
+          <label><input type="checkbox" value="230000004"/><span>大灵兽果</span></label>
+          <label><input type="checkbox" value="230000005"/><span>小净瓶水</span></label>
+          <label><input type="checkbox" value="230000006"/><span>大净瓶水</span></label>
+          <label><input type="checkbox" value="230000007"/><span>道书</span></label>
+          <label><input type="checkbox" value="230000008"/><span>传说随机精怪碎片</span></label>
+          <label><input type="checkbox" value="230000009"/><span>灵石</span></label>
+          <label><input type="checkbox" value="230000010"/><span>传说精怪碎片</span></label>
+          <label><input type="checkbox" value="230000012"/><span>腾蛇信物</span></label>
+          <label><input type="checkbox" value="230000013"/><span>小玄黄果</span></label>
+          <label><input type="checkbox" value="230000014"/><span>大玄黄果</span></label>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>福地杂项</h3>
+        <div class="form-group">
+          <label><input type="checkbox" id="ignoreTimeCheck"/> 忽略时间检测（晚上非高效时段也偷）</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 福地规则 ============ -->
+    <div id="homelandTab" class="tab-content">
+      <div class="config-section">
+        <h3>普通规则</h3>
+        <p class="help-text" style="margin-bottom:0.5rem">全天生效的偷取规则，按顺序匹配</p>
+        <div id="rulesContainer" class="rules-container"></div>
+        <button class="add-rule-btn" data-container="rulesContainer">+ 添加规则</button>
+      </div>
+      <div class="config-section">
+        <h3>虚弱时间规则</h3>
+        <p class="help-text" style="margin-bottom:0.5rem">福地老鼠虚弱时使用此规则，适合晚间派遣</p>
+        <div id="rulesWeakContainer" class="rules-container"></div>
+        <button class="add-rule-btn" data-container="rulesWeakContainer">+ 添加规则</button>
+      </div>
+      <div class="config-section">
+        <h3>高效时间规则</h3>
+        <p class="help-text" style="margin-bottom:0.5rem">高效时间段（10-12点、18-20点、22-24点）使用</p>
+        <div id="rulesStrongContainer" class="rules-container"></div>
+        <button class="add-rule-btn" data-container="rulesStrongContainer">+ 添加规则</button>
+      </div>
+    </div>
+
+    <!-- ============ 功能开关 ============ -->
+    <div id="switchesTab" class="tab-content">
+      <div class="config-section">
+        <h3>基础功能</h3>
+        <div class="switch-grid">
+          <label class="switch-item"><input type="checkbox" id="switch_homeland"/><span>福地自动总开关</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_homelandGetReward"/><span>福地自动收获</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_chopTree"/><span>自动砍树</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_talent"/><span>自动灵脉</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_gatherEnergy"/><span>聚灵阵</span></label>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>战斗/竞赛</h3>
+        <div class="switch-grid">
+          <label class="switch-item"><input type="checkbox" id="switch_herorank"/><span>光速群英榜</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_herorankFightDaily"/><span>群英榜每日瞎打</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_invade"/><span>异兽入侵</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_wildBoss"/><span>挑战妖王</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_skywar"/><span>问鼎苍穹</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_starTrial"/><span>星宿试炼</span></label>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>修炼/宗门</h3>
+        <div class="switch-grid">
+          <label class="switch-item"><input type="checkbox" id="switch_pupil"/><span>宗门自动训练</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_career"/><span>洞府道途</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_townDemon"/><span>镇魔</span></label>
+          <label class="switch-item"><input type="checkbox" id="switch_holyLand"/><span>九幽争霸</span></label>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>其他</h3>
+        <div class="switch-grid">
+          <label class="switch-item"><input type="checkbox" id="switch_activity"/><span>自动领取活动奖励</span></label>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>开关子参数</h3>
+        <div class="form-inline">
+          <div class="form-group"><label>冒险/真火/镇妖塔次数 (0=不挑战)</label><input type="number" id="switch_challenge"/></div>
+          <div class="form-group"><label>斗法券触发数量</label><input type="number" id="switch_ticket" max="2"/><p class="help-text">券数量>此值自动斗法</p></div>
+        </div>
+        <div class="form-inline" style="margin-top:0.75rem">
+          <div class="form-group"><label><input type="checkbox" id="switch_challengeSuccessReset"/> 挑战成功重置次数</label><p class="help-text">过关/塔后重置回初始次数</p></div>
+          <div class="form-group"><label>挑战窗口开始(时)</label><input type="number" id="switch_challengeWindowStart" min="0" max="23" style="width:70px"/></div>
+          <div class="form-group"><label>挑战窗口结束(时)</label><input type="number" id="switch_challengeWindowEnd" min="0" max="23" style="width:70px"/></div>
+        </div>
+        <h4 style="margin-top:1rem">分身选择</h4>
+        <div class="form-inline">
+          <div class="form-group"><label>空闲分身</label><select id="switch_defaultIndex"><option value="0">元体</option><option value="1">阳神</option><option value="2">阴神</option></select></div>
+          <div class="form-group"><label>挑战分身（冒险/真火/塔）</label><select id="switch_challengeIndex"><option value="0">元体</option><option value="1">阳神</option><option value="2">阴神</option></select></div>
+          <div class="form-group"><label>入侵分身（异兽）</label><select id="switch_invadeIndex"><option value="0">元体</option><option value="1">阳神</option><option value="2">阴神</option></select></div>
+          <div class="form-group"><label>问鼎苍穹分身</label><select id="switch_skywarIndex"><option value="0">元体</option><option value="1">阳神</option><option value="2">阴神</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 砍树 ============ -->
+    <div id="chopTreeTab" class="tab-content">
+      <div class="config-section">
+        <h3>砍树模式</h3>
+        <div class="form-inline">
+          <div class="form-group">
+            <label>模式选择</label>
+            <select id="chopTree_chopMode">
+              <option value="strict">严格模式 — 按属性筛选装备</option>
+              <option value="power">绝对妖力提升 — 妖力提升就换，不看属性</option>
+            </select>
+            <p class="help-text" style="margin-top:0.3rem">
+              <strong>严格模式</strong>：按分身属性条件筛选，有停止条件（桃子数量/等级/次数）。<br/>
+              <strong>妖力模式</strong>：有桃就砍，装备只看妖力提升，不管属性是否匹配。
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="config-section">
+        <h3>停止条件</h3>
+        <p class="help-text" style="margin-bottom:0.5rem">妖力模式下只有"桃子数量"生效，其余忽略</p>
+        <div class="form-inline">
+          <div class="form-group"><label>桃子数量小于</label><input type="number" id="chopTree_stop_num"/></div>
+          <div class="form-group"><label>砍树次数上限</label><input type="text" id="chopTree_stop_doNum"/></div>
+          <div class="form-group"><label>玩家等级等于</label><input type="text" id="chopTree_stop_level"/></div>
+        </div>
+        <div class="form-group" style="margin-top:0.75rem">
+          <label><input type="checkbox" id="chopTree_showResult"/> 显示砍树结果</label>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>装备分离</h3>
+        <div class="form-group"><label><input type="checkbox" id="chopTree_separation_fightValueFirst"/> 妖力优先</label></div>
+        <div class="form-inline">
+          <div class="form-group"><label>最低品质</label><select id="chopTree_separation_quality">
+            <option value="1">凡品</option><option value="2">下品</option><option value="3">中品</option>
+            <option value="4">上品</option><option value="5">极品</option><option value="6">仙品</option>
+            <option value="7">完美</option><option value="8">先天</option><option value="9">至宝</option>
+            <option value="10">灵宝1星</option><option value="11">灵宝2星</option><option value="12">灵宝3星</option>
+            <option value="13">灵宝4星</option><option value="14">灵宝5星</option>
+            <option value="15">真宝1星</option><option value="16">真宝2星</option><option value="17">真宝3星</option>
+            <option value="18">真宝4星</option><option value="19">真宝5星</option>
+          </select></div>
+          <div class="form-group"><label>等级偏移量</label><input type="number" id="chopTree_separation_levelOffset"/></div>
+          <div class="form-group"><label>概率偏移值</label><input type="number" id="chopTree_separation_probOffset" step="0.1"/></div>
+          <div class="form-group"><label>低等级偏移</label><input type="number" id="chopTree_separation_probOffsetLowLv" step="0.1"/></div>
+        </div>
+
+        <h4 style="margin:1rem 0 0.5rem">分身属性选择</h4>
+        <table class="avatar-attributes">
+          <thead><tr><th>分身</th><th>主属性</th><th>抗性</th></tr></thead>
+          <tbody>
+            <tr><td>元体</td>
+              <td><select id="chopTree_separation_condition_0_0">          <option value="1">攻击</option><option value="2">生命</option><option value="3">防御</option><option value="4">敏捷</option><option value="5">击晕</option><option value="6">暴击</option><option value="7">连击</option><option value="8">闪避</option><option value="9">反击</option><option value="10">吸血</option></select></td>
+              <td><select id="chopTree_separation_condition_0_1"><option value="11">抗击晕</option><option value="12">抗暴击</option><option value="13">抗连击</option><option value="14">抗闪避</option><option value="15">抗反击</option><option value="16">抗吸血</option></select></td>
+            </tr>
+            <tr><td>阳神</td>
+              <td><select id="chopTree_separation_condition_1_0">          <option value="1">攻击</option><option value="2">生命</option><option value="3">防御</option><option value="4">敏捷</option><option value="5">击晕</option><option value="6">暴击</option><option value="7">连击</option><option value="8">闪避</option><option value="9">反击</option><option value="10">吸血</option></select></td>
+              <td><select id="chopTree_separation_condition_1_1"><option value="11">抗击晕</option><option value="12">抗暴击</option><option value="13">抗连击</option><option value="14">抗闪避</option><option value="15">抗反击</option><option value="16">抗吸血</option></select></td>
+            </tr>
+            <tr><td>阴神</td>
+              <td><select id="chopTree_separation_condition_2_0">          <option value="1">攻击</option><option value="2">生命</option><option value="3">防御</option><option value="4">敏捷</option><option value="5">击晕</option><option value="6">暴击</option><option value="7">连击</option><option value="8">闪避</option><option value="9">反击</option><option value="10">吸血</option></select></td>
+              <td><select id="chopTree_separation_condition_2_1"><option value="11">抗击晕</option><option value="12">抗暴击</option><option value="13">抗连击</option><option value="14">抗闪避</option><option value="15">抗反击</option><option value="16">抗吸血</option></select></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="form-group" style="margin-top:0.75rem">
+          <label><input type="checkbox" id="chopTree_separation_strictMode"/> 启用装备严格模式</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 灵脉 ============ -->
+    <div id="talentTab" class="tab-content">
+      <div class="config-section">
+        <h3>灵脉设置</h3>
+        <p class="help-text" style="margin-bottom:1rem">灵脉现在"有花就用"，花用光自动停。筛选条件从砍树属性配置自动推导。装备判断只看敏捷属性提升。</p>
+        <div class="form-inline">
+          <div class="form-group"><label>最低品质</label><input type="number" id="talent_separation_quality" min="1" max="9"/></div>
+        </div>
+        <div class="form-group" style="margin-top:0.75rem">
+          <label><input type="checkbox" id="talent_showResult"/> 显示灵脉结果</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 九幽争霸 ============ -->
+    <div id="holyLandTab" class="tab-content">
+      <div class="config-section">
+        <h3>九幽争霸设置</h3>
+        <p class="help-text" style="margin-bottom:1rem">此功能自动进入活动、购买礼包、跟随标记攻击</p>
+        <div class="form-group">
+          <label>仙玉购买上限</label>
+          <input type="number" id="holyLand_maxJadeCost" min="0"/>
+          <p class="help-text">购买礼包允许的最大仙玉消耗，0则不买</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 灵兽 ============ -->
+    <div id="petTab" class="tab-content">
+      <div class="config-section">
+        <h3>灵兽期望池</h3>
+        <p class="help-text" style="margin-bottom:1rem">自动刷新灵兽池子，刷出期望灵兽后自动抓捕。点击灵兽名称选中/取消。</p>
+        <div id="petTagGroup" class="tag-group" style="margin-bottom:0.75rem">
+          <!-- JS动态生成 -->
+        </div>
+        <div style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted)">
+          已选：<span id="petSelectedHint">无</span>
+          <button id="petClearAll" class="btn btn-sm" style="margin-left:0.75rem">清空全部</button>
+          <button id="petSelectCommon" class="btn btn-sm" style="margin-left:0.5rem">选常用</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="button-container">
+      <button id="saveConfig" class="btn btn-primary" style="padding:0.6rem 2rem">💾 保存配置</button>
+      <button id="backBtn" class="btn" style="padding:0.6rem 2rem">← 返回控制台</button>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+  <div class="loading-overlay" id="overlay" style="display:none"><div class="spinner"></div></div>
+
+  <!-- 规则模板（隐藏）-->
+  <template id="ruleTemplate">
+    <div class="rule-template">
+      <div class="rule-content">
+        <div class="form-group">
+          <label>物品</label>
+          <select class="item-select">
+            <option value="100004">仙桃</option>
+            <option value="100025">净瓶水</option>
+            <option value="100029">琉璃珠</option>
+            <option value="100044">天衍令</option>
+            <option value="100047">昆仑铁</option>
+            <option value="100003">灵石</option>
+            <option value="100000">仙玉</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>最低品质</label>
+          <input type="number" class="min-level" min="1" max="9" value="3"/>
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" class="is-check"/>启用检查</label>
+        </div>
+      </div>
+      <button class="delete-rule-btn" title="删除">×</button>
+    </div>
+  </template>
+
+  <script src="../js/api.js?v=4"></script>
+  <script src="../js/config_new.js?v=6"></script>
+
+  <script>(function(){var c=document.getElementById('particles');if(c)for(var i=0;i<25;i++){var p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.width=p.style.height=(Math.random()*3+1)+'px';p.style.animationDuration=(Math.random()*20+12)+'s';p.style.animationDelay=Math.random()*12+'s';c.appendChild(p)}})();</script>
+</body>
+</html>

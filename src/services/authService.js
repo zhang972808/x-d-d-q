@@ -59,15 +59,24 @@ export default class AuthService {
         return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(str)).trim();
     }
 
-    createRequestBody(token, uid, uname) {
+    createRequestBody(token, uid, uname, encode = false, gxid = null) {
         const dataObj = {
+            appID: "223",
+            gameId: "24147",
+            pid: "37h5",
             clientId: uuidv4(),
+            oaid: global.account?.oaid || "",
+            sqGameId: "913",
             token: token,
             uid: uid,
-            uname: uname
+            uname: uname,
+            time: Math.floor(Date.now() / 1000).toString(),
+            c_game_id: "24147",
         };
+        if (gxid) dataObj.gxid = gxid;
 
-        return encodeURIComponent(JSON.stringify(dataObj));
+        const jsonStr = JSON.stringify(dataObj);
+        return encode ? encodeURIComponent(jsonStr) : jsonStr;
     }
 
     async firstRequest(username, password) {
@@ -120,20 +129,29 @@ export default class AuthService {
         }
     }
 
-    async thirdRequest(serverId, token, uid, username) {
-        const requestBody = this.createRequestBody(token, uid, username);
+    async thirdRequest(serverId, token, uid, username, gxid = null) {
+        const requestBody = this.createRequestBody(token, uid, username, true, gxid);
 
         const data = JSON.stringify({
             "data": requestBody,
             "loginType": 0,
+            "deviceplate": "Android",
+            "deviceId": global.account?.deviceId || "25098PN5AC-F6E86379FFA9E00ABFB9D5A302B0629FD41637EF",
             "channelId": 31,
             "appid": "37h5",
-            "gameId": 223
+            "gameId": 223,
+            "urlType": "mainLandAppUrl",
+            "packageId": global.account?.packageId || "31003001",
+            "c_game_id": "24147"
         });
+
+        const url = `https://proxy-xddq-cn.ap3615.com/s${serverId}_http/player/login`;
+        logger.info(`[Third] 请求URL: ${url}`);
+        logger.info(`[Third] 请求体: ${data}`);
 
         const config = {
             method: 'post',
-            url: `https://proxy-xddq.hdnd01.com/s${serverId}_http/player/login`,
+            url: url,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -142,9 +160,10 @@ export default class AuthService {
 
         try {
             const response = await axios(config);
+            logger.info(`[Third] API返回: status=${response.status}, data=${JSON.stringify(response.data)}`);
             return response.data;
         } catch (error) {
-            console.error(error);
+            logger.error(`[Third] 请求失败: ${error.message}, response=${JSON.stringify(error.response?.data)}`);
             throw error;
         }
     }
@@ -153,10 +172,11 @@ export default class AuthService {
         try {
             const response = await this.firstRequest(username, password);
             const firstResponse = response.data;
+            logger.info(`[Bind] API返回: code=${response.code}, msg=${response.msg}, full=${JSON.stringify(response)}`);
             if (response.code === 1) {
                 return firstResponse;
             } else {
-                throw new Error("登陆失败");
+                throw new Error(`登陆失败: ${response.msg || response.code}`);
             }
         } catch (error) {
             console.error(error);
@@ -168,7 +188,7 @@ export default class AuthService {
         try {
             const firstResponse = await this.Bind(username, password);
             const uid = firstResponse.userinfo.uid;
-            const url = "https://login-xddq.hdnd01.com/server/list";
+            const url = "https://login-xddq-cn.ap3615.com/server/list";
             const headers = {
                 "content-type": "application/json",
             };
@@ -180,6 +200,8 @@ export default class AuthService {
 
             const response = await axios.post(url, body, { headers });
             const { serverList, playerServerList } = response.data;
+            logger.info(`[List] 完整响应: ${JSON.stringify(response.data).substring(0, 2000)}`);
+            logger.info(`[List] 步月山相关服务器: ${JSON.stringify(serverList.filter(s => s.serverName.includes('步月山')))}`);
 
             if (!playerServerList || playerServerList.length === 0) {
                 throw new Error("无活跃服务器");
@@ -206,27 +228,32 @@ export default class AuthService {
             const firstResponse = await this.Bind(username, password);
             const ptoken = firstResponse.app_pst;
             const uid = firstResponse.userinfo.uid;
+            const gxid = firstResponse.gxid || null;
 
             const secondResponse = await this.secondRequest(username, ptoken);
+            logger.info(`[Second] API返回: code=${secondResponse.code}, msg=${secondResponse.msg}, full=${JSON.stringify(secondResponse)}`);
             if (secondResponse.code === 1) {
                 const app_pst = secondResponse.data.app_pst;
+                // 使用37平台返回的login_account作为uname，而非原始用户名
+                const loginAccount = secondResponse.data.userinfo?.login_account || username;
+                logger.info(`[Login] uname使用: ${loginAccount} (原始: ${username})`);
 
-                const thirdResponse = await this.LoginWithToken(serverId, app_pst, uid, username, password);
+                const thirdResponse = await this.LoginWithToken(serverId, app_pst, uid, loginAccount, password, gxid);
                 return thirdResponse;
             } else {
-                throw new Error("登陆失败");
+                throw new Error(`第二步登陆失败: ${secondResponse.msg || secondResponse.code}`);
             }
         } catch (error) {
             throw new Error(error.message || "登陆失败");
         }
     }
 
-    async LoginWithToken(serverId, app_pst, uid, username, password) {
+    async LoginWithToken(serverId, app_pst, uid, username, password, gxid = null) {
         try {
-            const thirdResponse = await this.thirdRequest(serverId, app_pst, uid, username);
+            const thirdResponse = await this.thirdRequest(serverId, app_pst, uid, username, gxid);
 
             if (thirdResponse.ret !== 0) {
-                throw new Error("登陆失败");
+                throw new Error(`游戏服务器拒绝登录 (ret=${thirdResponse.ret})。可能原因：1) API已更新需抓包 2) 服务器维护 3) 账号异常`);
             }
             logger.info(`登录成功, ${JSON.stringify(thirdResponse, null, "\t")}`);
             // 更新账户信息 保存token uid

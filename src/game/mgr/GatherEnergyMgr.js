@@ -6,6 +6,7 @@ import BagMgr from "#game/mgr/BagMgr.js";
 import SystemUnlockMgr from "#game/mgr/SystemUnlockMgr.js";
 import LoopMgr from "#game/common/LoopMgr.js";
 import UserMgr from "#game/mgr/UserMgr.js";
+import PlayerAttributeMgr from "#game/mgr/PlayerAttributeMgr.js";
 
 export default class GatherEnergyMgr {
     constructor() {
@@ -22,6 +23,7 @@ export default class GatherEnergyMgr {
         this.LOOP_CHECK_CD = 5 * 60 * 1000;
         this.initialized = false;
         this.isProcessing = false;
+        this.joinedIds = [];                // 已加入的聚灵阵id列表
     }
 
     static get inst() {
@@ -107,7 +109,10 @@ export default class GatherEnergyMgr {
     // 聚灵阵列表
     // 规则: 当前在21点之前，则找一个结束时间在今天21点30分之前，产量最高的，当前时间大于21点，则按原来逻辑执行
     GatherEnergyFirstListViewResp(t) {
-        const filteredData = t.list.filter(item => Number(item.openerMsg.playerId) !== Number(UserMgr.playerId));
+        const filteredData = t.list.filter(item =>
+            Number(item.openerMsg.playerId) !== Number(UserMgr.playerId) &&
+            !this.joinedIds.includes(item.energyBaseMsg.id)
+        );
         const now = new Date();
         const nowHour = now.getHours();
 
@@ -129,7 +134,7 @@ export default class GatherEnergyMgr {
             endTime = nextDay10amMs;
         }
 
-        
+
         let maxIncome = 0;
         let maxIncomeObj = null;
 
@@ -147,10 +152,21 @@ export default class GatherEnergyMgr {
             return
         }
 
+        // 记录已加入的id，防止重复进入
+        this.joinedIds.push(maxIncomeObj.energyBaseMsg.id);
+
         //入阵坐下
         logger.error(`[聚灵阵管理] 进入 ${maxIncomeObj.openerMsg.nickName} 聚灵阵 产能:${maxIncomeObj.energyBaseMsg.income} 结束时间 ${new Date(Number(maxIncomeObj.energyBaseMsg.endTime)).toLocaleString()}`);
         GameNetMgr.inst.sendPbMsg(Protocol.S_GATHER_ENERGY_ATTEND_NEW, { id: maxIncomeObj.energyBaseMsg.id });// 请求聚灵阵列表
         this.attendNum += 1;
+
+        // VIP可以进2个阵，继续请求列表
+        const maxAttendNum = (PlayerAttributeMgr.isMonthCardVip || PlayerAttributeMgr.isYearCardVip) ? 2 : 1;
+        if (this.attendNum < maxAttendNum) {
+            setTimeout(() => {
+                GameNetMgr.inst.sendPbMsg(Protocol.S_GATHER_ENERGY_FIRST_LIST_VIEW, { offset: 0, filterType: 1 });
+            }, 2000);
+        }
     }
 
     async loopUpdate() {
@@ -185,8 +201,9 @@ export default class GatherEnergyMgr {
                 this.openGatherEnergy()
             }
 
-            //  
-            if (this.attendNum == 0) {
+            // 判断聚灵阵加入数量是否已满
+            const maxAttendNum = (PlayerAttributeMgr.isMonthCardVip || PlayerAttributeMgr.isYearCardVip) ? 2 : 1;
+            if (this.attendNum < maxAttendNum) {
                 GameNetMgr.inst.sendPbMsg(Protocol.S_GATHER_ENERGY_FIRST_LIST_VIEW, { offset: 0, filterType: 1 });// 请求聚灵阵列表
             }
 

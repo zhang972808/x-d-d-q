@@ -1452,6 +1452,16 @@ class Protocol {
     static S_MATCH_3_GET_RANK = 216908;
     static S_MATCH_3_RESTART = 216909;
     static S_LIVE_SHOW_NOTIFY_REQ = 217701;
+
+    // 职业系统 (道途/Profession)
+    static S_PROFESSION_SWITCH_CAREER = 18001;
+    static S_PROFESSION_SYNC_DATA = 18002;
+    static S_PROFESSION_TRAIN = 18003;
+    static S_PROFESSION_BATTLE_BOSS = 18004;
+    static S_PROFESSION_GET_BOSS_ATTR = 18005;
+    static S_PROFESSION_GET_ATTR_MAP = 18006;
+    static S_PROFESSION_GET_TASK_REWARD = 18007;
+    static S_CAREER_SYNC_PLAYER_DATA = 218002;
 }
 
 export default Protocol;
