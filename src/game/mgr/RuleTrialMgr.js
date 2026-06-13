@@ -38,12 +38,18 @@ export default class RuleTrialMgr {
     }
 
     async loopUpdate() {
+        // 每日重置
+        const todayRT = new Date().toISOString().slice(0, 10);
+        if (this._lastDayRT !== todayRT) {
+            this._lastDayRT = todayRT;
+            this.isRepeated = false;
+        }
+
         if (this.isProcessing || !this.initialized) return;
         this.isProcessing = true;
         try {
             if (this.isRepeated) {
-                logger.info(`[法则试练] 速战已完成,终止任务`);
-                this.clear();
+                logger.info(`[法则试练] 今日已完成，明日继续`);
                 return;
             }
             logger.info(`[法则试练] 速战开始`);

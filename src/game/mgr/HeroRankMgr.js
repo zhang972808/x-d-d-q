@@ -3,6 +3,7 @@ import Protocol from "#game/net/Protocol.js";
 import logger from "#utils/logger.js";
 import SystemUnlockMgr from "#game/mgr/SystemUnlockMgr.js";
 import LoopMgr from "#game/common/LoopMgr.js";
+import UserMgr from "#game/mgr/UserMgr.js";
 
 /**
  * 群英榜 — 每日打榜，无时间限制

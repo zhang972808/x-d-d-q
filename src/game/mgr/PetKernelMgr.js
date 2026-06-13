@@ -59,6 +59,13 @@ export default class PetKernelMgr {
     }
 
     async loopUpdate() {
+        // 每日重置
+        const todayPK = new Date().toISOString().slice(0, 10);
+        if (this._lastDayPK !== todayPK) {
+            this._lastDayPK = todayPK;
+            this.freeDrawTimes = 0;
+        }
+
         if (!this.initialized) return;
         if (this.isProcessing) return;
         this.isProcessing = true;
@@ -68,8 +75,7 @@ export default class PetKernelMgr {
             await new Promise(resovle => setTimeout(resovle, 6 * 1000));
 
             if (this.freeDrawTimes == 2) {
-                logger.info(`[灵兽内丹] 达到每日最大领取次数，停止奖励领取`);
-                this.clear();
+                logger.info(`[灵兽内丹] 今日已达上限，明日继续`);
                 return;
             } else {
                 this.processReward();

@@ -74,18 +74,24 @@ export default class StarTrialMgr {
     }
 
     async loopUpdate() {
+        // 每日重置
+        const todayST = new Date().toISOString().slice(0, 10);
+        if (this._lastDayST !== todayST) {
+            this._lastDayST = todayST;
+            this.challengeTimes = 30;
+        }
+
         if (!this.enabled || !this.initialized) return;
         if (this.isProcessing) return;
         this.isProcessing = true;
         try {
             if (this.challengeTimes <= 20) {
-                logger.info(`[星宿试炼] 任务完成,停止循环`)
-                this.clear();
+                logger.info(`[星宿试炼] 今日已达上限，明日继续`)
                 return
             }
             if (this.lastBossId == this.bossId) {
                 logger.info(`[星宿试炼] 无法杀死星宿,任务终止`)
-                this.clear();
+                this._dailyDone = true;
                 return
             }
 

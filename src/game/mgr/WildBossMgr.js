@@ -76,13 +76,20 @@ export default class WildBossMgr {
             return;
         }
 
+        // 每日重置
+        const today = new Date().toISOString().slice(0, 10);
+        if (this._lastDay !== today) {
+            this._lastDay = today;
+            this.getAdRewardTimes = 0;
+            this.lastAdRewardTime = 0;
+        }
+
         if (this.isProcessing) return;
         this.isProcessing = true;
 
         try {
             if (this.getAdRewardTimes >= this.AD_REWARD_DAILY_MAX_NUM) {
-                this.clear();
-                logger.info("[挑战妖王管理] 达到每日最大领取次数，停止奖励领取");
+                logger.info("[挑战妖王管理] 今日已达上限，明日继续");
             } else {
                 this.processReward();
             }

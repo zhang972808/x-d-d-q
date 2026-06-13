@@ -212,9 +212,15 @@ export default class CareerMgr {
         return;
       }
 
-      // 2. 挑战boss（每天最多20次）
+      // 2. 先查询boss属性再挑战
       if (battleTimesToday < DAILY_BATTLE_MAX) {
-        this.requestBattleBoss();
+        if (!this._queriedBeforeFight) {
+          this._queriedBeforeFight = true;
+          this.requestQuery();
+        } else {
+          this._queriedBeforeFight = false;
+          this.requestBattleBoss();
+        }
         this.lastActionTime = now;
         return;
       }

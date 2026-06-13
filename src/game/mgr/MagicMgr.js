@@ -58,13 +58,20 @@ export default class MagicMgr {
     }
 
     async loopUpdate() {
+        // 每日重置
+        const todayMG = new Date().toISOString().slice(0, 10);
+        if (this._lastDayMG !== todayMG) {
+            this._lastDayMG = todayMG;
+            this.getAdRewardTimes = 0;
+            this.freeDrawTimes = 0;
+        }
+
         if (this.isProcessing) return;
         this.isProcessing = true;
 
         try {
             if (this.getAdRewardTimes >= this.AD_REWARD_DAILY_MAX_NUM && this.freeDrawTimes >= this.FREE_NUM) {
-                this.clear();
-                logger.info("[神通管理] 达到每日最大领取次数，停止奖励领取");
+                logger.info("[神通管理] 今日已达上限，明日继续");
             } else {
                 this.processReward();
             }

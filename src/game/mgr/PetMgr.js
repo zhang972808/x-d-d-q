@@ -125,13 +125,19 @@ export default class PetMgr {
 
     // 定时执行方法
     async loopUpdate() {
+        // 每日重置
+        const todayPET = new Date().toISOString().slice(0, 10);
+        if (this._lastDayPET !== todayPET) {
+            this._lastDayPET = todayPET;
+            this.freeRefreshTimes = 0;
+        }
+
         if (this.isProcessing || !this.initialized) return;
         this.isProcessing = true;
 
         try {
             if (this.freeRefreshTimes >= this.MAX_FREE_REFRESH_NUM) {
-                this.clear();
-                logger.info("[灵兽管理] 灵兽刷新达到每日最大领取次数，停止刷新");
+                logger.info("[灵兽管理] 今日已达上限，明日继续");
                 return;
             }
 
@@ -141,7 +147,6 @@ export default class PetMgr {
 
             if (this.wishPets.length == 0) {
                 logger.info(`[灵兽刷新] 无期望灵兽,不执行免费刷新`);
-                this.clear();
                 return;
             }
 

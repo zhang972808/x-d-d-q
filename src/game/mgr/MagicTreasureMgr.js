@@ -78,6 +78,13 @@ export default class MagicTreasureMgr {
     }
 
     async loopUpdate() {
+        // 每日重置
+        const todayMJ = new Date().toISOString().slice(0, 10);
+        if (this._lastDayMJ !== todayMJ) {
+            this._lastDayMJ = todayMJ;
+            this.jackpotData.forEach(j => { j.adFreeTimes = 0; j.freeDrawTimes = 0; });
+        }
+
         if (this.isProcessing) return;
         this.isProcessing = true;
 
@@ -86,10 +93,7 @@ export default class MagicTreasureMgr {
                 this.jackpotData.every((i) => i.adFreeTimes >= this.AD_REWARD_DAILY_MAX_NUM) &&
                 this.jackpotData.every((i) => i.freeDrawTimes >= this.FREE_NUM)
             ) {
-                this.clear();
-                logger.info("[法宝管理] 达到每日最大领取次数，停止奖励领取");
-                this.isProcessing = false;
-                return;
+                logger.info("[法宝管理] 今日已达上限，明日继续");
             } else {
                 this.processReward();
             }
