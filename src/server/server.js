@@ -3,10 +3,8 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
-import https from 'https';
 import { WebSocketServer } from 'ws';
 import fs from 'fs';
-import { execSync } from 'child_process';
 import logger from '#utils/logger.js';
 import { authMiddleware } from '#server/middleware.js';
 import { getActiveNotices, getRunningAccounts, initDatabase } from '#server/database.js';
@@ -19,21 +17,10 @@ import gameAccountRoutes from '#server/gameAccountRoutes.js';
 import adminRoutes from '#server/adminRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CERT_DIR = process.env.CERT_DIR || path.resolve(__dirname, '../..');
 const PORT = process.env.MGMT_PORT || 8080;
 
 const app = express();
-// 优先 HTTPS，证书不存在则回退 HTTP
-let server;
-const keyPath = path.join(CERT_DIR, 'server.key');
-const certPath = path.join(CERT_DIR, 'server.crt');
-if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
-  server = https.createServer({ key: fs.readFileSync(keyPath), cert: fs.readFileSync(certPath) }, app);
-  console.log('  [SSL] 使用 HTTPS');
-} else {
-  server = http.createServer(app);
-  console.log('  [SSL] 未找到证书，使用 HTTP');
-}
+const server = http.createServer(app);
 
 // ==================== 中间件 ====================
 app.use(cors());
