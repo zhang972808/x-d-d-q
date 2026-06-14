@@ -152,7 +152,12 @@ class LoopMgr {
 
             this.loopTaskList.forEach(item => {
                 if (item && typeof item.loopUpdate === 'function') {
-                    item.loopUpdate();
+                    try {
+                        item.loopUpdate();
+                    } catch (e) {
+                        const name = item.constructor?.name || 'unknown';
+                        logger.error(`[${name}] loopUpdate 异常: ${e.message}`);
+                    }
                 }
             });
         }, 1000);
@@ -162,7 +167,12 @@ class LoopMgr {
             this.onceTaskIntervalTimeId = setInterval(() => {
                 this.onceTaskList.forEach(item => {
                     if (item && typeof item.loopUpdate === 'function') {
-                        item.loopUpdate();
+                        try {
+                            item.loopUpdate();
+                        } catch (e) {
+                            const name = item.constructor?.name || 'unknown';
+                            logger.error(`[${name}] loopUpdate 异常: ${e.message}`);
+                        }
                     }
                 });
             }, 15 * 1000);
