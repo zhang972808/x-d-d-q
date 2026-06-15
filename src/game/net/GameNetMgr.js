@@ -30,6 +30,7 @@ class GameNetMgr {
 
     this.messageQueue = []; // 创建消息队列
     this.isSending = false; // 标记是否正在发送消息
+    this.reconnectMaxRetries = 5; // 最大重连次数
   }
 
   static get inst() {
@@ -87,18 +88,18 @@ class GameNetMgr {
     logger.error("[WebSocket] 已断开连接");
     this.close();
 
-    if (this.retryCount < this.maxRetries) {
+    if (this.retryCount < this.reconnectMaxRetries) {
       this.retryCount++;
-      logger.warn(`[GameNetMgr] 第 ${this.retryCount} 次重连中...`);
+      logger.warn(`[GameNetMgr] 第 ${this.retryCount}/${this.reconnectMaxRetries} 次重连...`);
 
       if (!this.isLogined && !this.isReConnectting) {
         this.reconnect();
       }
     } else {
       logger.error(
-        `[GameNetMgr] 已达到最大重连次数 ${this.maxRetries}，停止重连。`
+        `[GameNetMgr] 已重连 ${this.reconnectMaxRetries} 次失败，停止重连。`
       );
-      process.exit(1);
+      // 不退出进程，让其他功能继续执行
     }
   }
 
@@ -282,15 +283,19 @@ class GameNetMgr {
     logger.info("[GameNetMgr] 重连中...");
     this.isReConnectting = true;
     this.close();
-    LoopMgr.inst.end();
-    RegistMgr.inst.reset();
+    // 不停循环，不重置注册表，让其他功能继续运行
 
-    const reconnectInterval =
-      resetInterval || global.account.reconnectInterval || 5000;
-    await this.countdown(reconnectInterval);
+    const waitMs = resetInterval || 300000; // 默认等5分钟
+    await this.countdown(waitMs);
 
-    const { wsAddress, playerId, token } = await this.doLogin();
-    this.connectGameServer(wsAddress, playerId, token);
+    try {
+      const { wsAddress, playerId, token } = await this.doLogin();
+      this.connectGameServer(wsAddress, playerId, token);
+      this.retryCount = 0; // 重连成功重置计数
+      logger.info("[GameNetMgr] 重连成功");
+    } catch (e) {
+      logger.warn(`[GameNetMgr] 重连失败: ${e.message}`);
+    }
 
     this.isReConnectting = false;
   }
