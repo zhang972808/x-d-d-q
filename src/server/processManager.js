@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import logger from '#utils/logger.js';
-import { updateAccountStatus } from '#server/database.js';
+import { getAccountById, updateAccountStatus } from '#server/database.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
