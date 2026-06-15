@@ -34,7 +34,6 @@ import BagMgr from "#game/mgr/BagMgr.js";
 import DestinyMgr from "#game/mgr/DestinyMgr.js";
 import TownDemonMgr from "#game/mgr/TownDemonMgr.js";
 import TaskMgr from "#game/mgr/TaskMgr.js";
-import CareerMgr from "#game/mgr/CareerMgr.js";
 
 class LoopMgr {
 
@@ -96,8 +95,7 @@ class LoopMgr {
         this.add(ActivityMgr.inst, true);
         this.add(TownDemonMgr.inst, true);
         this.add(TaskMgr.inst, true);
-        this.add(CareerMgr.inst, true);
-    }
+            }
 
     start() {
         this.end();
