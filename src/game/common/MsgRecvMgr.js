@@ -34,6 +34,7 @@ import UnionBountyMgr from "#game/mgr/UnionBountyMgr.js";
 import DBMgr from "#game/common/DBMgr.js";
 import SkyWarMgr from "#game/mgr/SkyWarMgr.js";
 import TownDemonMgr from "#game/mgr/TownDemonMgr.js";
+import CareerMgr from "#game/mgr/CareerMgr.js";
 import MailRewardMgr from "#game/mgr/MailMgr.js";
 
 class MsgRecvMgr {
