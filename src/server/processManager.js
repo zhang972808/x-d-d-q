@@ -137,21 +137,6 @@ export async function startGameAccount(account) {
     updateAccountStatus(id, 'stopped', null, null);
     releasePort(port);
     processes.delete(id);
-
-    // 自动重启（排除主动停止的）
-    if (code !== null && !child._manualStop) {
-      setTimeout(() => {
-        // 从数据库读取最新配置再重启
-        const { getAccountById } = require('#server/database.js');
-        const acc = getAccountById(id);
-        if (acc) {
-          addLog('进程退出后自动重启...');
-          startGameAccount(acc).catch(e => {
-            addLog(`自动重启失败: ${e.message}`, 'error');
-          });
-        }
-      }, 10000); // 等待10秒后重启
-    }
   });
 
   processes.set(id, {
