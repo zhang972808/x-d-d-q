@@ -21,9 +21,17 @@ class Attribute {
         logger.info(`[砍树] 砍树 ${times} 次`);
 
         const separation = global.account.chopTree.separation;
-        let attr = separation.strictMode
-            ? [...new Set((separation.strictConditions || []).flatMap(condition => [...condition.primaryAttribute, ...condition.secondaryAttribute]))]
-            : (separation.condition || []).flat();
+        const chopMode = global.account.chopTree?.chopMode || "strict";
+        let attr;
+        if (chopMode === "power") {
+            // 妖力模式：不筛选属性，所有属性都收
+            attr = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+        } else {
+            // 严格模式：按 condition 筛选
+            attr = separation.strictMode
+                ? [...new Set((separation.strictConditions || []).flatMap(condition => [...condition.primaryAttribute, ...condition.secondaryAttribute]))]
+                : (separation.condition || []).flat();
+        }
 
         return GameNetMgr.inst.sendPbMsg(Protocol.S_ATTRIBUTE_DREAM_MSG, { auto: true, attr: attr, times: times });
     }
@@ -384,15 +392,18 @@ export default class PlayerAttributeMgr {
 
     doChopTree() {
         const peachNum = BagMgr.inst.getGoodsNum(100004);
+        const chopMode = global.account.chopTree?.chopMode || "strict";
 
         if (this.initPeachNum == -1) this.initPeachNum = peachNum;
         const hasDoNum = this.initPeachNum - peachNum;
 
-        const stopNum = global.account.chopTree?.stop?.num ?? 50;
-        const stopLevel = (typeof global.account.chopTree?.stop?.level === 'string' && global.account.chopTree.stop.level.toLowerCase() === 'infinity') ? Infinity : (global.account.chopTree?.stop?.level || Infinity);
-        const doNum = (typeof global.account.chopTree?.stop?.doNum === 'string' && global.account.chopTree.stop.doNum.toLowerCase() === 'infinity') ? Infinity : (global.account.chopTree?.stop?.doNum || Infinity);
+        const stopNum = global.account.chopTree?.stop?.num ?? (chopMode === "power" ? 0 : 50);
+        const stopLevel = chopMode === "power" ? Infinity :
+            ((typeof global.account.chopTree?.stop?.level === 'string' && global.account.chopTree.stop.level.toLowerCase() === 'infinity') ? Infinity : (global.account.chopTree?.stop?.level || Infinity));
+        const doNum = chopMode === "power" ? Infinity :
+            ((typeof global.account.chopTree?.stop?.doNum === 'string' && global.account.chopTree.stop.doNum.toLowerCase() === 'infinity') ? Infinity : (global.account.chopTree?.stop?.doNum || Infinity));
 
-        if (peachNum <= stopNum || PlayerAttributeMgr.level <= stopLevel || hasDoNum >= doNum) {
+        if (peachNum <= stopNum || (isFinite(stopLevel) && PlayerAttributeMgr.level <= stopLevel) || hasDoNum >= doNum) {
             logger.warn(`[砍树] 停止任务, 还剩余 ${peachNum} 桃子`);
             this.chopEnabled = false;
             this.switchToDefaultSeparation();
