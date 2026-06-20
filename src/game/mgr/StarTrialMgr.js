@@ -77,8 +77,8 @@ export default class StarTrialMgr {
         // 每日重置
         const _nowBJ = new Date(new Date().getTime() + 8*3600000);
         const today = _nowBJ.toISOString().slice(0, 10);
-        if (this._lastDayST !== todayST) {
-            this._lastDayST = todayST;
+        if (this._lastDayST !== today) {
+            this._lastDayST = today;
             this.challengeTimes = 30;
         }
 

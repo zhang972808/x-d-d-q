@@ -128,8 +128,8 @@ export default class PetMgr {
         // 每日重置
         const _nowBJ = new Date(new Date().getTime() + 8*3600000);
         const today = _nowBJ.toISOString().slice(0, 10);
-        if (this._lastDayPET !== todayPET) {
-            this._lastDayPET = todayPET;
+        if (this._lastDayPET !== today) {
+            this._lastDayPET = today;
             this.freeRefreshTimes = 0;
         }
 

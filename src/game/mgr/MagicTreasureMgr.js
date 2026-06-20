@@ -81,8 +81,8 @@ export default class MagicTreasureMgr {
         // 每日重置
         const _nowBJ = new Date(new Date().getTime() + 8*3600000);
         const today = _nowBJ.toISOString().slice(0, 10);
-        if (this._lastDayMJ !== todayMJ) {
-            this._lastDayMJ = todayMJ;
+        if (this._lastDayMJ !== today) {
+            this._lastDayMJ = today;
             this.jackpotData.forEach(j => { j.adFreeTimes = 0; j.freeDrawTimes = 0; });
         }
 
