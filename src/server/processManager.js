@@ -118,16 +118,23 @@ export async function startGameAccount(account) {
 
   child.stdout.on('data', (data) => {
     const lines = data.toString().split('\n').filter(Boolean);
-    lines.forEach(line => addLog(line, 'info'));
+    lines.forEach(line => {
+      addLog(line, 'info');
+      logger.info(`[子进程 ${nickname || id}] ${line}`);
+    });
   });
 
   child.stderr.on('data', (data) => {
     const lines = data.toString().split('\n').filter(Boolean);
-    lines.forEach(line => addLog(line, 'error'));
+    lines.forEach(line => {
+      addLog(line, 'error');
+      logger.error(`[子进程 ${nickname || id}] ${line}`);
+    });
   });
 
   child.on('error', (err) => {
     addLog(`进程错误: ${err.message}`, 'error');
+    logger.error(`[子进程 ${nickname || id}] spawn 错误: ${err.message}`);
     updateAccountStatus(id, 'stopped', null, port);
     releasePort(port);
     processes.delete(id);
@@ -135,6 +142,9 @@ export async function startGameAccount(account) {
 
   child.on('exit', (code, signal) => {
     addLog(`进程退出 (code=${code}, signal=${signal})`, code === 0 ? 'info' : 'warn');
+    if (code !== 0 || signal) {
+      logger.warn(`[子进程 ${nickname || id}] 异常退出: code=${code}, signal=${signal}, pid=${child.pid}, port=${port}`);
+    }
     updateAccountStatus(id, 'stopped', null, null);
     releasePort(port);
     processes.delete(id);
