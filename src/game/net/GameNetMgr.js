@@ -96,16 +96,31 @@ class GameNetMgr {
         this.reconnect();
       }
     } else {
-      logger.error(
-        `[GameNetMgr] 已重连 ${this.reconnectMaxRetries} 次失败，停止重连。`
+      logger.warn(
+        `[GameNetMgr] 已重连 ${this.reconnectMaxRetries} 次失败，重置计数并继续循环...`
       );
-      // 不退出进程，让其他功能继续执行
+      this.retryCount = 0;
+      if (!this.isLogined && !this.isReConnectting) {
+        this.reconnect();
+      }
     }
   }
 
   netErrorHandler() {
     logger.error("[WebSocket] 连接错误");
     this.close();
+    // 连接错误也触发重连逻辑
+    if (this.retryCount < this.reconnectMaxRetries) {
+      this.retryCount++;
+      logger.warn(`[GameNetMgr] 连接错误，第 ${this.retryCount}/${this.reconnectMaxRetries} 次重连...`);
+      if (!this.isReConnectting) {
+        this.reconnect();
+      }
+    } else {
+      logger.warn(`[GameNetMgr] 已重连 ${this.reconnectMaxRetries} 次失败，重置计数并继续循环...`);
+      this.retryCount = 0;
+      this.reconnect();
+    }
   }
 
   login() {

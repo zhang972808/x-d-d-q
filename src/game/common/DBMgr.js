@@ -52,9 +52,12 @@ class DBMgr {
 
             await Promise.all(readPromises);
 
-            logger.debug('All databases initialized successfully.');
+            logger.info('All databases initialized successfully.');
         } catch (error) {
-            logger.error('Error initializing databases:', error);
+            logger.error(`[DBMgr] 数据库初始化失败: ${error.message}`);
+            logger.error(`[DBMgr] 基础路径: ${this.basePath}`);
+            // 抛出异常让上层决定是否继续
+            throw error;
         }
     }
 

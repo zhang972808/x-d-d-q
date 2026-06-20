@@ -7,7 +7,6 @@ import LoopMgr from "#game/common/LoopMgr.js";
 import RegistMgr from "#game/common/RegistMgr.js";
 import express from "express";
 import path from "path";
-import { fileURLToPath } from "url";
 import cors from "cors";
 import fs from "fs";
 import WebSocket, { WebSocketServer } from "ws";
@@ -56,9 +55,16 @@ export default async () => {
   app.use(cors());
   app.use(express.json());
 
-  // 静态文件服务 - 前端页面
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  app.use(express.static(path.resolve(__dirname, "../../public")));
+  // 子进程不提供完整前端页面，统一重定向到管理端口
+  const MGMT_PORT = process.env.MGMT_PORT || 8080;
+  app.use((req, res, next) => {
+    const isPage = req.path === '/' || req.path.endsWith('.html');
+    if (isPage && !req.path.startsWith('/api/')) {
+      const host = req.headers.host?.split(':')[0] || 'localhost';
+      return res.redirect(`http://${host}:${MGMT_PORT}${req.path}`);
+    }
+    next();
+  });
 
   // GET /api/servers - 获取服务器列表
   app.get("/api/servers", async (req, res) => {

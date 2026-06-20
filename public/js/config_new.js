@@ -253,6 +253,14 @@
   function fillConfig(config) {
     if (!config) return;
 
+    // 顶部账号信息（disabled 只读，直接赋值，不走 fields 机制）
+    var cfgServerId = $('cfg_serverId');
+    if (cfgServerId && config.serverId !== undefined) cfgServerId.value = config.serverId;
+    var cfgUsername = $('cfg_username');
+    if (cfgUsername && config.username !== undefined) cfgUsername.value = config.username;
+    var cfgToken = $('cfg_token');
+    if (cfgToken && config.token !== undefined) cfgToken.value = config.token;
+
     writeFields(config, 'basic');
     writeFields(config.homeland || {}, 'homeMisc');
     writeFields(config, 'union');

@@ -50,7 +50,7 @@
           if (resp.code === 200) {
             var q = resp.data;
             var el = $('quotaInfo');
-            if (el) el.textContent = '账号: ' + (q.used || 0) + ' / ' + (q.total || 0);
+            if (el) el.textContent = '账号: ' + (q.used || 0) + ' / ' + (q.quota || 0);
           }
         } catch (e) {}
       }

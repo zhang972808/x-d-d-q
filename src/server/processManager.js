@@ -48,6 +48,7 @@ export async function startGameAccount(account) {
       logger.info(`[ProcessManager] 账号 "${nickname || id}" 已在运行，先停止旧进程 (PID: ${existing.pid})`);
       existing.process.kill("SIGTERM");
     }
+    if (existing.port) releasePort(existing.port);
     processes.delete(id);
   }
 

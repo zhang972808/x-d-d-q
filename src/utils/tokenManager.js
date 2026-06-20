@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import logger from "./logger.js";
 
-const SECRET_KEY = "your-secret-key"; // 在生产环境中应该使用环境变量
-const TOKEN_EXPIRY = "24h"; // token有效期为24小时
+const SECRET_KEY = process.env.JWT_SECRET || "xddq-server-secret-key-change-me";
+const TOKEN_EXPIRY = "7d";
 
 export default class TokenManager {
   /**
