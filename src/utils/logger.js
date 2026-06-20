@@ -1,6 +1,13 @@
 import winston from "winston";
 import WebSocket from "ws";
 import Transport from "winston-transport";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const LOG_DIR = path.resolve(__dirname, "../../logs");
+fs.mkdirSync(LOG_DIR, { recursive: true });
 
 const loglevel = process.env.LOGLEVEL || "info";
 
@@ -76,6 +83,11 @@ const logger = winston.createLogger({
   format: createLogFormat(),
   transports: [
     new winston.transports.Console({}),
+    new winston.transports.File({
+      filename: path.join(LOG_DIR, "app.log"),
+      maxsize: 10 * 1024 * 1024, // 10MB 滚动
+      maxFiles: 5,
+    }),
     new WebSocketTransport({
       // 每次发送日志时都会调用这个函数，获取最新的 wsClient
       getWsClient: () => currentWsClient,

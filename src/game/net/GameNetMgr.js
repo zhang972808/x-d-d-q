@@ -88,34 +88,39 @@ class GameNetMgr {
     logger.error("[WebSocket] 已断开连接");
     this.close();
 
+    if (this.isManualClose) {
+      logger.info("[GameNetMgr] 手动关闭，不重连");
+      this.isManualClose = false;
+      return;
+    }
+
     if (this.retryCount < this.reconnectMaxRetries) {
       this.retryCount++;
       logger.warn(`[GameNetMgr] 第 ${this.retryCount}/${this.reconnectMaxRetries} 次重连...`);
-
-      if (!this.isLogined && !this.isReConnectting) {
-        this.reconnect();
-      }
+      this.reconnect();
     } else {
       logger.warn(
         `[GameNetMgr] 已重连 ${this.reconnectMaxRetries} 次失败，重置计数并继续循环...`
       );
       this.retryCount = 0;
-      if (!this.isLogined && !this.isReConnectting) {
-        this.reconnect();
-      }
+      this.reconnect();
     }
   }
 
   netErrorHandler() {
     logger.error("[WebSocket] 连接错误");
     this.close();
-    // 连接错误也触发重连逻辑
+
+    if (this.isManualClose) {
+      logger.info("[GameNetMgr] 手动关闭，不重连");
+      this.isManualClose = false;
+      return;
+    }
+
     if (this.retryCount < this.reconnectMaxRetries) {
       this.retryCount++;
       logger.warn(`[GameNetMgr] 连接错误，第 ${this.retryCount}/${this.reconnectMaxRetries} 次重连...`);
-      if (!this.isReConnectting) {
-        this.reconnect();
-      }
+      this.reconnect();
     } else {
       logger.warn(`[GameNetMgr] 已重连 ${this.reconnectMaxRetries} 次失败，重置计数并继续循环...`);
       this.retryCount = 0;
@@ -295,8 +300,11 @@ class GameNetMgr {
   }
 
   async reconnect(resetInterval = null) {
-    logger.info("[GameNetMgr] 重连中...");
+    // 防止并发重连
+    if (this.isReConnectting) return;
     this.isReConnectting = true;
+
+    logger.info("[GameNetMgr] 重连中...");
     this.close();
     // 不停循环，不重置注册表，让其他功能继续运行
 
