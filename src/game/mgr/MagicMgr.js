@@ -61,8 +61,8 @@ export default class MagicMgr {
         // 每日重置
         const _nowBJ = new Date(new Date().getTime() + 8*3600000);
         const today = _nowBJ.toISOString().slice(0, 10);
-        if (this._lastDayMG !== todayMG) {
-            this._lastDayMG = todayMG;
+        if (this._lastDayMG !== today) {
+            this._lastDayMG = today;
             this.getAdRewardTimes = 0;
             this.freeDrawTimes = 0;
         }
