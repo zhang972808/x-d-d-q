@@ -47,7 +47,8 @@ export default class FrogMgr {
 
     async loopUpdate() {
         // 每日重置
-        const today = new Date().toISOString().slice(0, 10);
+        const _nowBJ = new Date(new Date().getTime() + 8*3600000);
+        const today = _nowBJ.toISOString().slice(0, 10);
         if (this._lastDay !== today) {
             this._lastDay = today;
             this.getAdRewardTimes = 0;

@@ -79,7 +79,8 @@ export default class MagicTreasureMgr {
 
     async loopUpdate() {
         // 每日重置
-        const todayMJ = new Date().toISOString().slice(0, 10);
+        const _nowBJ = new Date(new Date().getTime() + 8*3600000);
+        const today = _nowBJ.toISOString().slice(0, 10);
         if (this._lastDayMJ !== todayMJ) {
             this._lastDayMJ = todayMJ;
             this.jackpotData.forEach(j => { j.adFreeTimes = 0; j.freeDrawTimes = 0; });

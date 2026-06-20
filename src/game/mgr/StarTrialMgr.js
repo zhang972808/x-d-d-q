@@ -75,7 +75,8 @@ export default class StarTrialMgr {
 
     async loopUpdate() {
         // 每日重置
-        const todayST = new Date().toISOString().slice(0, 10);
+        const _nowBJ = new Date(new Date().getTime() + 8*3600000);
+        const today = _nowBJ.toISOString().slice(0, 10);
         if (this._lastDayST !== todayST) {
             this._lastDayST = todayST;
             this.challengeTimes = 30;

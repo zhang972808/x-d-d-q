@@ -60,7 +60,8 @@ export default class PetKernelMgr {
 
     async loopUpdate() {
         // 每日重置
-        const todayPK = new Date().toISOString().slice(0, 10);
+        const _nowBJ = new Date(new Date().getTime() + 8*3600000);
+        const today = _nowBJ.toISOString().slice(0, 10);
         if (this._lastDayPK !== todayPK) {
             this._lastDayPK = todayPK;
             this.freeDrawTimes = 0;

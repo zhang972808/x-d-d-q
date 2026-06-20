@@ -126,7 +126,8 @@ export default class PetMgr {
     // 定时执行方法
     async loopUpdate() {
         // 每日重置
-        const todayPET = new Date().toISOString().slice(0, 10);
+        const _nowBJ = new Date(new Date().getTime() + 8*3600000);
+        const today = _nowBJ.toISOString().slice(0, 10);
         if (this._lastDayPET !== todayPET) {
             this._lastDayPET = todayPET;
             this.freeRefreshTimes = 0;
