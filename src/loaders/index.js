@@ -42,6 +42,16 @@ const authMiddleware = (req, res, next) => {
 };
 
 export default async () => {
+  // 全局捕获未处理的异常，防止静默崩溃
+  process.on("uncaughtException", (err) => {
+    logger.error(`[FATAL] 未捕获异常: ${err.message}\n${err.stack}`);
+    process.exit(1);
+  });
+  process.on("unhandledRejection", (reason) => {
+    logger.error(`[FATAL] 未处理的Promise拒绝: ${reason?.message || reason}\n${reason?.stack || ''}`);
+    process.exit(1);
+  });
+
   const app = express();
   app.use(cors());
   app.use(express.json());
@@ -279,6 +289,10 @@ export default async () => {
     const server = app.listen(port, () => {
       console.log(`Server running on port ${port}`);
     });
+    server.on("error", (err) => {
+      logger.error(`[FATAL] 服务器启动失败 (端口 ${port}): ${err.message}`);
+      process.exit(1);
+    });
 
     // 自动连接游戏（有账号密码就自动登录）
     const account = global.account || {};
@@ -354,5 +368,8 @@ export default async () => {
     });
   };
 
-  startServer();
+  startServer().catch((e) => {
+    logger.error(`[FATAL] startServer 失败: ${e.message}\n${e.stack}`);
+    process.exit(1);
+  });
 };

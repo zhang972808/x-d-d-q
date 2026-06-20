@@ -8,10 +8,7 @@ async function start() {
     const configPath = path.resolve(configFile);
 
     if (!fs.existsSync(configPath)) {
-        logger.error(`读取account失败:${configFile}`);
-		console.log('尝试读取文件：', configPath);
-		const data = fs.readFileSync(configPath, 'utf8');
-		console.log('文件内容：', data);
+        logger.error(`读取account失败: ${configFile}，文件不存在：${configPath}`);
         return;
     }
     
