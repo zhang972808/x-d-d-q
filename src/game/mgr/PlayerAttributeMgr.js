@@ -582,19 +582,9 @@ export default class PlayerAttributeMgr {
         let originalTalentDesc;
         const newTalentDesc = `${DBMgr.inst.getEquipmentQuality(quality)} ${u.attributeData.map(attr => `${DBMgr.inst.getAttribute(attr.type)}: ${attr.value}`).join(', ')}`;
 
-        // 判断是否为特殊灵脉
-        let isSpecial = false;
+        // 神兽灵脉（孔位 2,4,8,10）一律不换，直接分解
         if ([2, 4, 8, 10].includes(talentType)) {
-            if (condition.length === 0) {
-                if (showResult) logger.info(`[灵脉] ${name} 特殊灵脉无筛选条件，跳过`);
-                return false;
-            }
-            let skillIds = [...new Set(condition.flatMap(c => [...c.skillId]))];
-            if (skillIds.length > 0 && !skillIds.includes(u.skillId)) {
-                logger.warn(`[灵脉] ${name} 特殊灵脉为${DBMgr.inst.getAttribute(u.skillId)} 不匹配`);
-                return false;
-            }
-            isSpecial = true;
+            return false;
         }
 
         let betterAttributes = false;
@@ -605,7 +595,7 @@ export default class PlayerAttributeMgr {
             if (showResult) logger.info("[灵脉] 灵脉品质符合");
 
             // 符合哪个分身的条件
-            index = this.checkTalentCondition(u, condition, isSpecial);
+            index = this.checkTalentCondition(u, condition);
             if (index == -1) {
                 if (showResult) logger.info(`[灵脉] 粗筛不符合条件`);
                 return false;
@@ -664,7 +654,7 @@ export default class PlayerAttributeMgr {
         return newValue > oldValue;
     }
 
-    checkTalentCondition(u, condition, isSpecial) {
+    checkTalentCondition(u, condition) {
         if (!condition || condition.length === 0) {
             return -1;
         }
@@ -682,26 +672,16 @@ export default class PlayerAttributeMgr {
         for (let i = 0; i < condition.length; i++) {
             const c = condition[i];
 
-            // 检查属性是否严格匹配
-            const attributesMatch = c.attribute.every(attr => talentAttributes.includes(attr));
+            if (!c.attribute.every(attr => talentAttributes.includes(attr))) continue;
 
-            let skillIdMatch = true;
-            if (isSpecial) {
-                skillIdMatch = c.skillId.includes(u.skillId);
-            }
+            let currentScore = 0;
+            c.attribute.forEach(attrType => {
+                if (talentValues[attrType] !== undefined) {
+                    currentScore += talentValues[attrType];
+                }
+            });
 
-            // 如果属性和技能ID都严格匹配
-            if (attributesMatch && skillIdMatch) {
-                // 计算当前条件的得分
-                let currentScore = 0;
-                c.attribute.forEach(attrType => {
-                    if (talentValues[attrType] !== undefined) {
-                        currentScore += talentValues[attrType];
-                    }
-                });
-
-                // 如果当前条件的得分更高，或者得分相同但优先级更高
-                if ((currentScore > highestScore) || (currentScore === highestScore && c.priority < highestPriority)) {
+            if ((currentScore > highestScore) || (currentScore === highestScore && c.priority < highestPriority)) {
                     matchedCondition = i;
                     highestScore = currentScore;
                     highestPriority = c.priority;
