@@ -221,6 +221,7 @@ export default class PlayerAttributeMgr {
             this.unDealEquipmentDataMsg = t.undDealEquipmentDataMsg;
 
             const listResolve = [];
+            const listEquipVerify = []; // 穿了哪些装备，用于验证
 
             for (let i = 0; i < this.unDealEquipmentDataMsg.length; i++) {
                 const equipment = this.unDealEquipmentDataMsg[i];
@@ -234,16 +235,41 @@ export default class PlayerAttributeMgr {
                 const equipmentData = DBMgr.inst.getEquipment(equipmentId);
                 const equipmentName = equipmentData.name;
                 const equipmentType = equipmentData.type - 1;
+                const attackType = attributeList.attack.type;
+                const defenseType = attributeList.defense.type;
 
-                // 不猜归属，对三个分身逐个检查，有一个能用就穿
-                // 服务器 EquipAndResolveOld 自带装备分身归属，会自动装配到正确分身
-                const processed = await this.processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue);
+                // 用攻击属性匹配应该穿哪个分身（不猜 owner）
+                const matchedIdx = this.matchAvatarByAttributeType(attackType, defenseType);
+
+                const oldFightValues = { ...this.separationFightValue };
+
+                const processed = await this.processEquipment(
+                    quality, level, attributeList, equipmentType, id, equipmentId, fightValue, matchedIdx
+                );
 
                 if (!processed) {
                     logger.info(`[装备] 分解 ${id} ${DBMgr.inst.getEquipmentQuality(quality)} ${equipmentName}`);
                     listResolve.push(id);
                 } else {
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    listEquipVerify.push({ id, matchedIdx, oldFightValues });
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+
+            // 穿完后刷新分身数据，验证装备落在正确分身上
+            if (listEquipVerify.length > 0) {
+                Attribute.FetchSeparation();
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                for (const v of listEquipVerify) {
+                    const newFv = this.separationFightValue[v.matchedIdx] || 0;
+                    const oldFv = v.oldFightValues[v.matchedIdx] || 0;
+
+                    if (newFv === oldFv) {
+                        // 预期分身妖力没变，装备可能穿到其他分身了 → 分解新装备
+                        logger.warn(`[装备] 验证失败：${this.separationNames[v.matchedIdx]} 妖力未变化(${oldFv})，装备可能穿错分身，分解 id=${v.id}`);
+                        listResolve.push(v.id);
+                    }
                 }
             }
 
@@ -259,13 +285,45 @@ export default class PlayerAttributeMgr {
         }
     }
 
+    // 用装备攻击/抗性属性类型匹配该穿哪个分身
+    matchAvatarByAttributeType(attackType, defenseType) {
+        const rule = global.account.chopTree.separation;
 
+        const getExpected = (idx) => {
+            if (rule.strictMode && rule.strictConditions?.[idx]) {
+                return {
+                    primary: rule.strictConditions[idx].primaryAttribute || [],
+                    secondary: rule.strictConditions[idx].secondaryAttribute || [],
+                };
+            }
+            const cond = rule.condition?.[idx];
+            return {
+                primary: cond ? [cond[0]] : [],
+                secondary: cond ? [cond[1]] : [],
+            };
+        };
+
+        for (let idx = 0; idx < 3; idx++) {
+            const expected = getExpected(idx);
+            if (expected.primary.length > 0 && expected.primary.includes(attackType)) {
+                return idx;
+            }
+        }
+        for (let idx = 0; idx < 3; idx++) {
+            const expected = getExpected(idx);
+            if (expected.secondary.length > 0 && expected.secondary.includes(defenseType)) {
+                return idx;
+            }
+        }
+
+        return this.useSeparationIdx;
+    }
 
     haveUnDealEquipment() {
         return this.unDealEquipmentDataMsg.length > 0
     }
 
-    async processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue) {
+    async processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue, matchedIdx) {
         if (!this.separation) return false;
 
         const showResult = global.account.chopTree.showResult || false;
@@ -274,29 +332,14 @@ export default class PlayerAttributeMgr {
         const defenseType = attributeList.defense.type;
         const newEquipmentDesc = `${DBMgr.inst.getEquipmentQuality(quality)} ${DBMgr.inst.getEquipmentName(equipmentId)} ${DBMgr.inst.getAttribute(attackType)}:${attributeList.attack.value / 10} ${DBMgr.inst.getAttribute(defenseType)}:${attributeList.defense.value / 10}`;
         const chopMode = global.account.chopTree?.chopMode || "strict";
+        const index = matchedIdx ?? this.useSeparationIdx;
 
-        // ====== 不猜归属，逐个分身检查 ======
-        // 服务器 EquipAndResolveOld 自带装备分身归属，会自动装配到正确位置
-        for (let index = 0; index < 3; index++) {
-            const hit = this.checkAvatarEquipment(
-                index, quality, level, attackType, defenseType,
-                attributeList, equipmentType, id, fightValue,
-                rule, chopMode, showResult, newEquipmentDesc
-            );
-            if (hit) return true;
-        }
-
-        return false;
-    }
-
-    // 检查装备对某个分身是否值得穿
-    checkAvatarEquipment(index, quality, level, attackType, defenseType, attributeList, equipmentType, id, fightValue, rule, chopMode, showResult, newEquipmentDesc) {
         // ====== 绝对妖力提升模式 ======
         if (chopMode === "power") {
             if (quality < rule.quality) return false;
             if (this.separationFightValue[index] === undefined) return false;
             if (fightValue > (this.separationFightValue[index] || 0)) {
-                logger.warn(`[装备-妖力] ${this.separationNames[index]} ${newEquipmentDesc} 妖力 ${fightValue} > 当前 ${this.separationFightValue[index]}，穿上`);
+                logger.warn(`[装备-妖力] ${this.separationNames[index]} ${newEquipmentDesc} 穿上`);
                 Attribute.DealEquipmentEnum_EquipAndResolveOld(id);
                 return true;
             }
@@ -304,7 +347,6 @@ export default class PlayerAttributeMgr {
         }
 
         // ====== 严格模式 ======
-        // 检查装备属性是否匹配该分身的配置
         const expectedPrimary = rule.strictMode
             ? ((rule.strictConditions || [])[index]?.primaryAttribute || [])
             : (rule.condition?.[index] ? [rule.condition[index][0]] : []);
@@ -312,16 +354,14 @@ export default class PlayerAttributeMgr {
             ? ((rule.strictConditions || [])[index]?.secondaryAttribute || [])
             : (rule.condition?.[index] ? [rule.condition[index][1]] : []);
 
-        // 攻击类属性 type 5-10 必须匹配
+        // 不匹配该分身期望属性 → 分解
         if (expectedPrimary.some(t => t >= 5 && t <= 10) && !expectedPrimary.includes(attackType)) {
             return false;
         }
-        // 抗性 type 11-16 必须匹配
         if (expectedSecondary.length > 0 && !expectedSecondary.includes(defenseType)) {
             return false;
         }
 
-        // 属性匹配了这个分身，继续比数值
         let betterAttributes = false;
         let existingAttributeList = null;
         let existingExist = true;
@@ -330,7 +370,7 @@ export default class PlayerAttributeMgr {
         if (!this.equipmentData[index] || !this.equipmentData[index][equipmentType]) {
             betterAttributes = true;
             existingExist = false;
-            logger.warn(`[装备] 分身${this.separationNames[index]} 无原装备`);
+            logger.warn(`[装备] ${this.separationNames[index]} 无原装备，穿上`);
         } else {
             existingAttributeList = this.processAttributes(this.equipmentData[index][equipmentType].attributeList);
             originalEquipmentDesc = `${DBMgr.inst.getEquipmentQuality(this.equipmentData[index][equipmentType].quality)} ${DBMgr.inst.getEquipmentName(this.equipmentData[index][equipmentType].equipmentId)} ${DBMgr.inst.getAttribute(existingAttributeList.attack.type)}:${existingAttributeList.attack.value / 10} ${DBMgr.inst.getAttribute(existingAttributeList.defense.type)}:${existingAttributeList.defense.value / 10}`;
@@ -338,7 +378,7 @@ export default class PlayerAttributeMgr {
 
         if (!betterAttributes && quality >= rule.quality) {
             if (showResult) {
-                logger.info(`[装备] ${this.separationNames[index]} 新装备品质符合：${newEquipmentDesc} 等级：${level} 与原装备对比 ${originalEquipmentDesc} 等级：${this.equipmentData[index][equipmentType].level}`);
+                logger.info(`[装备] ${this.separationNames[index]} 品质符合：${newEquipmentDesc} Lv${level} vs ${originalEquipmentDesc} Lv${this.equipmentData[index][equipmentType].level}`);
             }
 
             const levelOffset = rule.levelOffset || 5;
@@ -357,30 +397,25 @@ export default class PlayerAttributeMgr {
             offsetMultiplier = Math.min(offsetMultiplier, 1);
 
             if (level >= (this.equipmentData[index][equipmentType].level - 1) && parseFloat(attributeList.attack.value) >= parseFloat(existingAttributeList.attack.value) * offsetMultiplier) {
-                if (showResult) logger.warn(`[装备] ${this.separationNames[index]} ${newEquipmentDesc} 等级${level} ≥ ${this.equipmentData[index][equipmentType].level - 1} 且攻击 ${attributeList.attack.value} ≥ ${existingAttributeList.attack.value * offsetMultiplier}`);
+                if (showResult) logger.warn(`[装备] ${this.separationNames[index]} Lv${level} ≥ Lv${this.equipmentData[index][equipmentType].level - 1} 且攻击 ${attributeList.attack.value} ≥ ${existingAttributeList.attack.value * offsetMultiplier}`);
                 betterAttributes = true;
             }
         }
 
-        // 无视品质：属性远高于概率偏移值
         if (existingExist && parseFloat(attributeList.attack.value) >= parseFloat(existingAttributeList.attack.value) * (1 + rule.probOffset)) {
-            if (showResult) logger.warn(`[装备] ${this.separationNames[index]} ${newEquipmentDesc} 攻击远高于旧装`);
             betterAttributes = true;
         }
 
-        // 妖力优先模式
         if (rule.fightValueFirst && quality >= rule.quality) {
             betterAttributes = (fightValue > this.separationFightValue[index]);
-            if (betterAttributes) logger.warn(`[装备] ${this.separationNames[index]} 妖力优先, 妖力提升: ${fightValue - this.separationFightValue[index]}`);
         }
 
         if (betterAttributes) {
             if (existingExist) {
-                logger.info(`[装备] ${this.separationNames[index]} 旧装备 ${originalEquipmentDesc}`);
+                logger.info(`[装备] ${this.separationNames[index]} 旧装 ${originalEquipmentDesc}`);
             }
-            logger.warn(`[装备] ${this.separationNames[index]} → 新装备 ${newEquipmentDesc}, 妖力: ${this.separationFightValue[index]} → ${fightValue}`);
+            logger.warn(`[装备] ${this.separationNames[index]} → 新装 ${newEquipmentDesc}`);
 
-            // 装备服务器自带分身归属，不需要脚本切换分身，直接穿即可
             Attribute.DealEquipmentEnum_EquipAndResolveOld(id);
             return true;
         }
