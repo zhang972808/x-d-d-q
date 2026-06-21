@@ -235,9 +235,9 @@ export default class PlayerAttributeMgr {
                 const equipmentName = equipmentData.name;
                 const equipmentType = equipmentData.type - 1;
 
-                // 通过装备附带的 fightValue 匹配归属于哪个分身
-                // 服务器砍树会掉落多个分身的装备，不能用当前分身一刀切
-                const sepIndex = this.matchSeparationByFightValue(equipment);
+                // 用装备攻击属性类型反推归属分身
+                // 暴击装备归属暴击分身，连击装备归属连击分身，不会错
+                const sepIndex = this.matchSeparationByAttackType(attackType, defenseType);
 
                 const processed = await this.processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue, sepIndex);
 
@@ -415,13 +415,7 @@ export default class PlayerAttributeMgr {
             }
             logger.warn(`[装备] ${this.separationNames[index]} → 新装备 ${newEquipmentDesc}, 妖力: ${this.separationFightValue[index]} → ${fightValue}`);
 
-            this.separationFightValue[index] = fightValue;
-
-            // 切换到装备归属的分身再穿上
-            if (this.useSeparationIdx !== index) {
-                this.setSeparationIdx(index);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
+            // 装备服务器自带分身归属，不需要脚本切换分身，直接穿即可
             Attribute.DealEquipmentEnum_EquipAndResolveOld(id);
             return true;
         }
