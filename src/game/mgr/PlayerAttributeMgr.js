@@ -235,8 +235,9 @@ export default class PlayerAttributeMgr {
                 const equipmentName = equipmentData.name;
                 const equipmentType = equipmentData.type - 1;
 
-                // 装备归属砍树时记录的分身，不需要靠属性值猜测
-                const sepIndex = this.chopSeparationIdx ?? this.useSeparationIdx;
+                // 通过装备附带的 fightValue 匹配归属于哪个分身
+                // 服务器砍树会掉落多个分身的装备，不能用当前分身一刀切
+                const sepIndex = this.matchSeparationByFightValue(equipment);
 
                 const processed = await this.processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue, sepIndex);
 
@@ -260,6 +261,48 @@ export default class PlayerAttributeMgr {
         }
     }
 
+
+    // 通过装备的 fightValue 匹配分身归属
+    // 服务器的战斗值比分身的属性数据更能准确区分分身
+    matchSeparationByFightValue(equipment) {
+        const eqFightValue = Number(equipment.fightValue) || 0;
+        if (eqFightValue === 0) return this.useSeparationIdx;
+
+        let bestIdx = this.useSeparationIdx;
+        let bestDiff = Infinity;
+
+        for (let idx = 0; idx < 3; idx++) {
+            const fv = this.separationFightValue[idx] || 0;
+            if (fv === 0) continue;
+            const diff = Math.abs(fv - eqFightValue);
+            if (diff < bestDiff) {
+                bestDiff = diff;
+                bestIdx = idx;
+            }
+        }
+
+        // 如果战斗值差太大（数据过期），尝试用属性列表辅助确认
+        if (bestDiff > 5000 && equipment.playerAttributeDataList?.length > 0) {
+            const eqTotal = equipment.playerAttributeDataList.reduce((sum, a) => sum + Number(a.value || 0), 0);
+            let attrBestIdx = bestIdx;
+            let attrBestDiff = Infinity;
+            for (let idx = 0; idx < 3; idx++) {
+                const sepList = this.playerAttributeData[idx];
+                if (!sepList || sepList.length === 0) continue;
+                const sepTotal = sepList.reduce((sum, a) => sum + Number(a.value || 0), 0);
+                const diff = Math.abs(sepTotal - eqTotal);
+                if (diff < attrBestDiff) {
+                    attrBestDiff = diff;
+                    attrBestIdx = idx;
+                }
+            }
+            if (attrBestDiff < bestDiff) {
+                bestIdx = attrBestIdx;
+            }
+        }
+
+        return bestIdx;
+    }
 
     haveUnDealEquipment() {
         return this.unDealEquipmentDataMsg.length > 0
