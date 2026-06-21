@@ -235,11 +235,9 @@ export default class PlayerAttributeMgr {
                 const equipmentName = equipmentData.name;
                 const equipmentType = equipmentData.type - 1;
 
-                // 用装备攻击属性类型反推归属分身
-                // 暴击装备归属暴击分身，连击装备归属连击分身，不会错
-                const sepIndex = this.matchSeparationByAttackType(attackType, defenseType);
-
-                const processed = await this.processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue, sepIndex);
+                // 不猜归属，对三个分身逐个检查，有一个能用就穿
+                // 服务器 EquipAndResolveOld 自带装备分身归属，会自动装配到正确分身
+                const processed = await this.processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue);
 
                 if (!processed) {
                     logger.info(`[装备] 分解 ${id} ${DBMgr.inst.getEquipmentQuality(quality)} ${equipmentName}`);
@@ -262,74 +260,43 @@ export default class PlayerAttributeMgr {
     }
 
 
-    // 通过装备的 fightValue 匹配分身归属
-    // 服务器的战斗值比分身的属性数据更能准确区分分身
-    matchSeparationByFightValue(equipment) {
-        const eqFightValue = Number(equipment.fightValue) || 0;
-        if (eqFightValue === 0) return this.useSeparationIdx;
-
-        let bestIdx = this.useSeparationIdx;
-        let bestDiff = Infinity;
-
-        for (let idx = 0; idx < 3; idx++) {
-            const fv = this.separationFightValue[idx] || 0;
-            if (fv === 0) continue;
-            const diff = Math.abs(fv - eqFightValue);
-            if (diff < bestDiff) {
-                bestDiff = diff;
-                bestIdx = idx;
-            }
-        }
-
-        // 如果战斗值差太大（数据过期），尝试用属性列表辅助确认
-        if (bestDiff > 5000 && equipment.playerAttributeDataList?.length > 0) {
-            const eqTotal = equipment.playerAttributeDataList.reduce((sum, a) => sum + Number(a.value || 0), 0);
-            let attrBestIdx = bestIdx;
-            let attrBestDiff = Infinity;
-            for (let idx = 0; idx < 3; idx++) {
-                const sepList = this.playerAttributeData[idx];
-                if (!sepList || sepList.length === 0) continue;
-                const sepTotal = sepList.reduce((sum, a) => sum + Number(a.value || 0), 0);
-                const diff = Math.abs(sepTotal - eqTotal);
-                if (diff < attrBestDiff) {
-                    attrBestDiff = diff;
-                    attrBestIdx = idx;
-                }
-            }
-            if (attrBestDiff < bestDiff) {
-                bestIdx = attrBestIdx;
-            }
-        }
-
-        return bestIdx;
-    }
 
     haveUnDealEquipment() {
         return this.unDealEquipmentDataMsg.length > 0
     }
 
-    async processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue, sepIndex) {
+    async processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue) {
         if (!this.separation) return false;
 
         const showResult = global.account.chopTree.showResult || false;
         const rule = global.account.chopTree.separation;
         const attackType = attributeList.attack.type;
         const defenseType = attributeList.defense.type;
-        let originalEquipmentDesc;
         const newEquipmentDesc = `${DBMgr.inst.getEquipmentQuality(quality)} ${DBMgr.inst.getEquipmentName(equipmentId)} ${DBMgr.inst.getAttribute(attackType)}:${attributeList.attack.value / 10} ${DBMgr.inst.getAttribute(defenseType)}:${attributeList.defense.value / 10}`;
-
         const chopMode = global.account.chopTree?.chopMode || "strict";
-        const index = (sepIndex !== undefined && sepIndex !== null) ? sepIndex : this.useSeparationIdx;
 
+        // ====== 不猜归属，逐个分身检查 ======
+        // 服务器 EquipAndResolveOld 自带装备分身归属，会自动装配到正确位置
+        for (let index = 0; index < 3; index++) {
+            const hit = this.checkAvatarEquipment(
+                index, quality, level, attackType, defenseType,
+                attributeList, equipmentType, id, fightValue,
+                rule, chopMode, showResult, newEquipmentDesc
+            );
+            if (hit) return true;
+        }
+
+        return false;
+    }
+
+    // 检查装备对某个分身是否值得穿
+    checkAvatarEquipment(index, quality, level, attackType, defenseType, attributeList, equipmentType, id, fightValue, rule, chopMode, showResult, newEquipmentDesc) {
         // ====== 绝对妖力提升模式 ======
         if (chopMode === "power") {
             if (quality < rule.quality) return false;
             if (this.separationFightValue[index] === undefined) return false;
-
-            const currentFight = this.separationFightValue[index] || 0;
-            if (fightValue > currentFight) {
-                logger.warn(`[装备-妖力] ${this.separationNames[index]} ${newEquipmentDesc} 妖力 ${fightValue} > 当前 ${currentFight}，穿上`);
-                this.separationFightValue[index] = fightValue;
+            if (fightValue > (this.separationFightValue[index] || 0)) {
+                logger.warn(`[装备-妖力] ${this.separationNames[index]} ${newEquipmentDesc} 妖力 ${fightValue} > 当前 ${this.separationFightValue[index]}，穿上`);
                 Attribute.DealEquipmentEnum_EquipAndResolveOld(id);
                 return true;
             }
@@ -337,7 +304,7 @@ export default class PlayerAttributeMgr {
         }
 
         // ====== 严格模式 ======
-        // 检查装备属性是否匹配该分身的配置（防止暴击分身穿了连击装备）
+        // 检查装备属性是否匹配该分身的配置
         const expectedPrimary = rule.strictMode
             ? ((rule.strictConditions || [])[index]?.primaryAttribute || [])
             : (rule.condition?.[index] ? [rule.condition[index][0]] : []);
@@ -345,22 +312,21 @@ export default class PlayerAttributeMgr {
             ? ((rule.strictConditions || [])[index]?.secondaryAttribute || [])
             : (rule.condition?.[index] ? [rule.condition[index][1]] : []);
 
-        // 攻击类属性 type 5-10 必须匹配，基本属性 1-4 所有装备都有，跳过检查
+        // 攻击类属性 type 5-10 必须匹配
         if (expectedPrimary.some(t => t >= 5 && t <= 10) && !expectedPrimary.includes(attackType)) {
-            if (showResult) logger.info(`[装备] ${this.separationNames[index]} 新装备攻击属性 ${DBMgr.inst.getAttribute(attackType)} 不匹配期望的 ${expectedPrimary.filter(t => t >= 5 && t <= 10).map(t => DBMgr.inst.getAttribute(t)).join('/')}，跳过`);
             return false;
         }
         // 抗性 type 11-16 必须匹配
         if (expectedSecondary.length > 0 && !expectedSecondary.includes(defenseType)) {
-            if (showResult) logger.info(`[装备] ${this.separationNames[index]} 新装备抗性 ${DBMgr.inst.getAttribute(defenseType)} 不匹配期望的 ${expectedSecondary.map(t => DBMgr.inst.getAttribute(t)).join('/')}，跳过`);
             return false;
         }
 
+        // 属性匹配了这个分身，继续比数值
         let betterAttributes = false;
         let existingAttributeList = null;
         let existingExist = true;
+        let originalEquipmentDesc;
 
-        // 分身这个部位没装备 → 属性已匹配，直接穿上
         if (!this.equipmentData[index] || !this.equipmentData[index][equipmentType]) {
             betterAttributes = true;
             existingExist = false;
@@ -403,10 +369,9 @@ export default class PlayerAttributeMgr {
         }
 
         // 妖力优先模式
-        const fightValueOffset = fightValue - this.separationFightValue[index];
         if (rule.fightValueFirst && quality >= rule.quality) {
-            betterAttributes = (fightValueOffset > 0);
-            if(betterAttributes) logger.warn(`[装备] ${this.separationNames[index]} 妖力优先, 妖力提升: ${fightValueOffset}`);
+            betterAttributes = (fightValue > this.separationFightValue[index]);
+            if (betterAttributes) logger.warn(`[装备] ${this.separationNames[index]} 妖力优先, 妖力提升: ${fightValue - this.separationFightValue[index]}`);
         }
 
         if (betterAttributes) {
