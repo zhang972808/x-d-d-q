@@ -3,7 +3,6 @@ import Protocol from "#game/net/Protocol.js";
 import logger from "#utils/logger.js";
 import LoopMgr from "#game/common/LoopMgr.js";
 import RegistMgr from "#game/common/RegistMgr.js";
-import WorkFlowMgr from "#game/common/WorkFlowMgr.js";
 import UserMgr from "#game/mgr/UserMgr.js";
 import ActivityMgr from "#game/mgr/ActivityMgr.js";
 
@@ -133,8 +132,6 @@ export default class HolyLandMgr {
     } else {
       logger.warn(`[幽冥战场] 打开地图失败: ret=${msgData.ret}`);
       this.hasEnteredGame = false;
-      // 进入失败，清理优先队列
-      WorkFlowMgr.inst.remove("HolyLand");
     }
   }
 
@@ -271,9 +268,7 @@ export default class HolyLandMgr {
     logger.info("[幽冥战场] 检测到活动开启，正在打开地图进入幽冥战场...");
     this.hasEnteredGame = true;
 
-    // 将幽冥战场加入优先队列，阻塞低优先级任务
-    WorkFlowMgr.inst.add("HolyLand");
-    logger.info("[幽冥战场] 已提升为高优先级任务，将阻塞征战诸天、闯关等低优先级任务");
+    // 幽冥战场优先级已从 WorkFlowMgr 移除，不再阻塞
 
     GameNetMgr.inst.sendPbMsg(Protocol.S_HOLY_LAND_GAME_INFO_LOAD, {
       playerId: UserMgr.playerId,
@@ -285,9 +280,6 @@ export default class HolyLandMgr {
     logger.info("[幽冥战场] 退出幽冥战场");
     this.isInGame = false;
     this.hasEnteredGame = false;
-
-    // 从优先队列移除
-    WorkFlowMgr.inst.remove("HolyLand");
   }
 
   // 发送活动心跳

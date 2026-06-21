@@ -11,7 +11,6 @@ export default class WorkFlowMgr {
             "ChopTree": 1,       // 1级项目
             "Talent": 2,         // 2级项目
             "Invade": 3,         // 3级项目 异兽入侵
-            "HolyLand": 4,       // 4级项目 幽冥战场(九幽争霸)
             "SkyWar": 5,         // 5级项目 征战诸天
         };
     }
