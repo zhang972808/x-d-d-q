@@ -549,16 +549,27 @@ export default class PlayerAttributeMgr {
 
     // 从砍树分身配置自动生成灵脉筛选条件
     buildTalentCondition() {
-        const strictConditions = global.account.chopTree?.separation?.strictConditions || [];
-        return strictConditions.map((sc, i) => {
-            const primaryAttr = sc.primaryAttribute?.[0];
-            const beastSkillId = PRIMARY_ATTR_TO_BEAST_SKILL[primaryAttr];
-            return {
-                skillId: beastSkillId ? [beastSkillId] : [],
-                attribute: [4], // 敏捷
-                priority: i,
-            };
-        });
+        const rule = global.account.chopTree?.separation || {};
+        const strictMode = rule.strictMode && rule.strictConditions?.length > 0;
+        if (strictMode) {
+            return rule.strictConditions.map((sc, i) => {
+                const primaryAttr = sc.primaryAttribute?.[0];
+                const beastSkillId = PRIMARY_ATTR_TO_BEAST_SKILL[primaryAttr];
+                return {
+                    skillId: beastSkillId ? [beastSkillId] : [],
+                    attribute: [4], // 敏捷
+                    priority: i,
+                };
+            });
+        }
+        // 非严格模式：从 condition 数组推导（[primaryAttr, secondaryAttr]）
+        const cond = rule.condition;
+        if (!cond || cond.length === 0) return [];
+        return cond.map((pair, i) => ({
+            skillId: PRIMARY_ATTR_TO_BEAST_SKILL[pair[0]] ? [PRIMARY_ATTR_TO_BEAST_SKILL[pair[0]]] : [],
+            attribute: [4], // 敏捷
+            priority: i,
+        }));
     }
 
     async processTalent(u, name) {
