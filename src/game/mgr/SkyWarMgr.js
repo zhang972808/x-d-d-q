@@ -15,8 +15,7 @@ import UserMgr from "#game/mgr/UserMgr.js";
 export default class SkyWarMgr {
     constructor() {
         this.isProcessing = false;
-        this.enabled = global.account.switch.skywar || false;
-        this.skywarIndex = global.account.switch.skywarIndex || 0;
+        this.skywarIndex = 0;
         // 最大挑战和最大免费刷新
         this.maxFightNum = 5;
         this.maxFreeRefreshTimes = 5;
@@ -191,7 +190,8 @@ export default class SkyWarMgr {
     }
 
     async loopUpdate() {
-        if (!WorkFlowMgr.inst.canExecute("SkyWar") || !this.enabled || this.isProcessing) return;
+        const enabled = global.account.switch?.skywar ?? false;
+        if (!WorkFlowMgr.inst.canExecute("SkyWar") || !enabled || this.isProcessing) return;
 
         this.isProcessing = true;
         try {
@@ -214,7 +214,7 @@ export default class SkyWarMgr {
             logger.info(`[征战诸天] 当前次数: ${this.fightNums}`);
 
             // 切换到分身
-            PlayerAttributeMgr.inst.setSeparationIdx(this.skywarIndex);
+            PlayerAttributeMgr.inst.setSeparationIdx(global.account.switch?.skywarIndex || 0);
             // 处理征战
             if (this.enemyData.length != 0) {
                 this.handleFight();

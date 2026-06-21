@@ -9,7 +9,6 @@ import WorkFlowMgr from "#game/common/WorkFlowMgr.js";
 export default class InvadeMgr {
     constructor() {
         this.isProcessing = false;
-        this.enabled = global.account.switch.invade || false;
         this.maxCount = 5;
         this.battleNum = 0;
     }
@@ -48,7 +47,8 @@ export default class InvadeMgr {
     }
 
     async loopUpdate() {
-        if (!WorkFlowMgr.inst.canExecute("Invade") || !this.enabled || this.isProcessing) return;
+        const enabled = global.account.switch?.invade ?? false;
+        if (!WorkFlowMgr.inst.canExecute("Invade") || !enabled || this.isProcessing) return;
 
         this.isProcessing = true;
         try {

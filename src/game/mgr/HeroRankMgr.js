@@ -12,7 +12,6 @@ import UserMgr from "#game/mgr/UserMgr.js";
 export default class HeroRankMgr {
     constructor() {
         this.isProcessing = false;
-        this.enabled = global.account.switch.herorank || false;
         this.buyNumDaily = 0;
         this.energy = 0;
         this.rank = null;
@@ -47,7 +46,7 @@ export default class HeroRankMgr {
             this.buyNumDaily = t.buyNumDaily || 0;
 
             const buyNumMax = this.getBuyNumMax();
-            if (this.enabled && this.buyNumDaily < buyNumMax && this.energy <= 50) {
+            if ((global.account.switch?.herorank ?? false) && this.buyNumDaily < buyNumMax && this.energy <= 50) {
                 const num = buyNumMax - this.buyNumDaily;
                 logger.info(`[群英榜管理] 购买体力 ${num}次`);
                 GameNetMgr.inst.sendPbMsg(Protocol.S_HERORANK_BUY_ENERGY, { num });
@@ -131,7 +130,7 @@ export default class HeroRankMgr {
 
     async loopUpdate() {
         if (this.isProcessing) return;
-        if (!this.enabled) return;
+        if (!(global.account.switch?.herorank ?? false)) return;
         if (this.energy < 1) {
             logger.info("[群英榜管理] 体力不足，停止");
             this.clear();

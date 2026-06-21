@@ -7,7 +7,6 @@ import LoopMgr from "#game/common/LoopMgr.js";
 export default class StarTrialMgr {
     constructor() {
         this.isProcessing = false;
-        this.enabled = global.account.switch.starTrial || false;
         this.challengeTimes = 30;
         this.rewardState = 0;
         this.lastBossId = 0;
@@ -82,7 +81,7 @@ export default class StarTrialMgr {
             this.challengeTimes = 30;
         }
 
-        if (!this.enabled || !this.initialized) return;
+        if (!(global.account.switch?.starTrial ?? false) || !this.initialized) return;
         if (this.isProcessing) return;
         this.isProcessing = true;
         try {

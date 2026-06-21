@@ -8,7 +8,6 @@ import SystemUnlockMgr from "#game/mgr/SystemUnlockMgr.js";
 
 export default class WildBossMgr {
     constructor() {
-        this.enabled = global.account.switch.wildBoss??true;                              // 默认开启
         this.AD_REWARD_DAILY_MAX_NUM = 6 + (PlayerAttributeMgr.isMonthCardVip ? 2 : 0);   // 每日最大领取次数
         this.AD_REWARD_CD = 1000;                                                         // 每次间隔时间
         this.passId = 0;                                                                  // 当前通关妖王ID
@@ -70,7 +69,7 @@ export default class WildBossMgr {
     }
 
     async loopUpdate() {
-        if (!this.enabled) {
+        if (!(global.account.switch?.wildBoss ?? true)) {
             logger.info("[挑战妖王管理] 挑战妖王未开启");
             this.clear();
             return;

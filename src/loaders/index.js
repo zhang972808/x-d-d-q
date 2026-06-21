@@ -300,6 +300,24 @@ export default async () => {
       process.exit(1);
     });
 
+    // 监听配置文件变化，10 秒检查一次 → 管理端保存配置后子进程自动生效
+    const configFile = global.configFile;
+    setInterval(() => {
+      try {
+        if (!fs.existsSync(configFile)) return;
+        const stat = fs.statSync(configFile);
+        const mtime = stat.mtimeMs;
+        if (!startServer._configMtime || mtime > startServer._configMtime) {
+          startServer._configMtime = mtime;
+          const data = fs.readFileSync(configFile, 'utf8');
+          const updated = JSON.parse(data);
+          // 只合并 switch、chopTree、talent 等配置节，不覆盖登录信息
+          Object.assign(global.account, updated);
+          logger.debug('[配置热加载] 配置文件已更新');
+        }
+      } catch (_) {}
+    }, 10000);
+
     // 自动连接游戏（有账号密码就自动登录）
     const account = global.account || {};
     if (account.serverId && account.username && account.password) {

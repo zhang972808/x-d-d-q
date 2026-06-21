@@ -18,7 +18,6 @@ export default class GatherEnergyMgr {
         this.attendNum = 0;                 // 聚灵阵参加数量
         this.num = 0;                       // 腾蛇信物数量
         this.lock = false;                  // 锁一下，避免拿不到
-        this.enabled = global.account.switch.gatherEnergy || false;  // 是否可以开启自己的聚灵阵
         this.lastLoopCheckTime = 0;
         this.LOOP_CHECK_CD = 5 * 60 * 1000;
         this.initialized = false;
@@ -197,7 +196,7 @@ export default class GatherEnergyMgr {
             }
 
 
-            if ((currentHour == 20 || currentHour == 10) && this.lock && this.enabled) {
+            if ((currentHour == 20 || currentHour == 10) && this.lock && (global.account.switch?.gatherEnergy ?? false)) {
                 this.openGatherEnergy()
             }
 

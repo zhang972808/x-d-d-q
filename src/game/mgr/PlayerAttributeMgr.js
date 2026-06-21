@@ -110,7 +110,6 @@ export default class PlayerAttributeMgr {
         this.chopTimes = 1;                                         // 根据树等级计算砍树次数
 
         this.unDealEquipmentDataMsg = [];                           // 未处理装备数据
-        this.chopEnabled = global.account.switch.chopTree || false; // 是否开启砍树
         this.previousPeachNum = 0;                                  // 用于存储上一次的桃子数量
         this.initPeachNum = -1;                                     // 用于存储初始桃子数量
         this.doneUnionTask = false;                                 // 是否开启妖盟任务
@@ -119,8 +118,6 @@ export default class PlayerAttributeMgr {
         this.talentData = { 0: [], 1: [], 2: [] };                  // 灵脉数据
         this.talentCreateLevel = 1;                                 // 灵脉等级
         this.talentCreateTimes = 1;                                 // 砍灵脉次数
-
-        this.talentEnabled = global.account.switch.talent || false; // 是否开启砍灵脉
         this.previousFlowerNum = 0;                                 // 用于存储上一次的灵脉花数量
         this.initFlowerNum = -1;                                    // 初灵脉花数量
 
@@ -866,7 +863,7 @@ export default class PlayerAttributeMgr {
 
             // 自动砍树逻辑
             if (WorkFlowMgr.inst.canExecute("ChopTree")) {
-                if (this.chopEnabled) {
+                if (global.account.switch?.chopTree ?? false) {
                     this.doChopTree();
                 } else {
                     WorkFlowMgr.inst.remove("ChopTree");
@@ -876,7 +873,7 @@ export default class PlayerAttributeMgr {
 
             // 自动砍灵脉逻辑
             if (WorkFlowMgr.inst.canExecute("Talent")) {
-                if (this.talentEnabled) {
+                if (global.account.switch?.talent ?? false) {
                     this.doAutoTalent();
                 } else {
                     WorkFlowMgr.inst.remove("Talent");

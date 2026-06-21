@@ -1,10 +1,16 @@
 import { Router } from 'express';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import {
   getAccountsByUserId, getAccountById, createAccount,
   updateAccount, deleteAccount, addAuditLog,
   getAccountCountByUser, findUserById,
 } from '#server/database.js';
 import { stopGameAccount, getGameStatus } from '#server/processManager.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
 const router = Router();
 
@@ -205,6 +211,35 @@ router.put('/:id/setting', (req, res) => {
       uid: baseUpdates.uid,
       config: newConfig,
     });
+
+    // 同时写入 JSON 配置文件，让子进程能实时读取
+    try {
+      const safeNickname = (account.nickname || `account_${accountId}`).replace(/[<>:"/\\|?*]/g, '_');
+      const configFileName = `${accountId}_${safeNickname}.json`;
+      const configPath = path.join(PROJECT_ROOT, 'data', configFileName);
+      const dataDir = path.dirname(configPath);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      // 构建完整配置（合并已有文件 + 新配置）
+      let existing = {};
+      try {
+        if (fs.existsSync(configPath)) {
+          existing = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        }
+      } catch (_) {}
+      const full = { ...existing, ...newConfig,
+        serverId: account.server_id,
+        username: account.game_username,
+        password: account.game_password,
+        nickName: account.nickname,
+        uid: account.uid,
+        token: account.token,
+      };
+      fs.writeFileSync(configPath, JSON.stringify(full, null, 4), 'utf8');
+    } catch (e) {
+      // 文件写入失败不阻塞API响应
+    }
 
     res.json({ code: 200, msg: '配置保存成功', data: null });
   } catch (err) {
