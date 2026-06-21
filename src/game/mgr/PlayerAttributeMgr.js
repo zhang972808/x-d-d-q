@@ -126,6 +126,7 @@ export default class PlayerAttributeMgr {
 
         // 🔒储存状态防止出现问题
         this.isProcessing = false;
+        this.chopSeparationIdx = null;  // 砍树时分身归属（防止匹配错误穿错分身）
     }
 
     static isMonthCardVip = false;  // 月卡
@@ -234,10 +235,8 @@ export default class PlayerAttributeMgr {
                 const equipmentName = equipmentData.name;
                 const equipmentType = equipmentData.type - 1;
 
-                // 从 playerAttributeDataList 找出这件装备属于哪个分身
-                // equipment.playerAttributeDataList 是装备掉落时那个分身的属性数据
-                // 用它匹配已知的分身数据来找到对应的 index
-                const sepIndex = this.findSeparationForEquipment(equipment);
+                // 装备归属砍树时记录的分身，不需要靠属性值猜测
+                const sepIndex = this.chopSeparationIdx ?? this.useSeparationIdx;
 
                 const processed = await this.processEquipment(quality, level, attributeList, equipmentType, id, equipmentId, fightValue, sepIndex);
 
@@ -261,28 +260,6 @@ export default class PlayerAttributeMgr {
         }
     }
 
-    // 通过装备附带的 playerAttributeDataList 匹配是哪个分身的
-    // 服务器在装备掉落时会带当时分身的属性数据，用来判断归属
-    findSeparationForEquipment(equipment) {
-        if (!equipment.playerAttributeDataList || equipment.playerAttributeDataList.length === 0) {
-            return this.useSeparationIdx; // 没数据就用当前分身
-        }
-        // 比较装备附带的属性数据跟哪个分身当前装备的属性最接近(按类型+值匹配)
-        // 最简单：取第一个属性的 type 跟掉落时 compare
-        const eqAttr = equipment.playerAttributeDataList[0];
-        if (!eqAttr) return this.useSeparationIdx;
-
-        // 用 basic 属性来匹配分身(不同分身的基础四维不同)
-        for (let idx = 0; idx < 3; idx++) {
-            const sepAttr = this.playerAttributeData[idx];
-            if (!sepAttr || sepAttr.length === 0) continue;
-            // 比较基础属性值是否相同
-            const match = sepAttr.some(a => a.type === eqAttr.type && String(a.value) === String(eqAttr.value));
-            if (match) return idx;
-        }
-        // 匹配不到就当前分身
-        return this.useSeparationIdx;
-    }
 
     haveUnDealEquipment() {
         return this.unDealEquipmentDataMsg.length > 0
@@ -440,6 +417,9 @@ export default class PlayerAttributeMgr {
             logger.info(`[砍树] 还剩 ${peachNum} 桃子, 当前分身=${this.separationNames[this.useSeparationIdx]}`);
             this.previousPeachNum = peachNum;
         }
+
+        // 记录砍树时的分身 —— 装备掉落默认归属这个分身，不需要用属性值猜
+        this.chopSeparationIdx = this.useSeparationIdx;
 
         // 直接砍树，不需要切换分身
         // 服务器返回的装备数据里自带分身的 playerAttributeDataList 和 fightValue
