@@ -682,10 +682,9 @@ export default class PlayerAttributeMgr {
             });
 
             if ((currentScore > highestScore) || (currentScore === highestScore && c.priority < highestPriority)) {
-                    matchedCondition = i;
-                    highestScore = currentScore;
-                    highestPriority = c.priority;
-                }
+                matchedCondition = i;
+                highestScore = currentScore;
+                highestPriority = c.priority;
             }
         }
 
