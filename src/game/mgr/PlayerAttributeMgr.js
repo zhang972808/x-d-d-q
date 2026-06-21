@@ -317,11 +317,30 @@ export default class PlayerAttributeMgr {
         }
 
         // ====== 严格模式 ======
+        // 检查装备属性是否匹配该分身的配置（防止暴击分身穿了连击装备）
+        const expectedPrimary = rule.strictMode
+            ? ((rule.strictConditions || [])[index]?.primaryAttribute || [])
+            : (rule.condition?.[index] ? [rule.condition[index][0]] : []);
+        const expectedSecondary = rule.strictMode
+            ? ((rule.strictConditions || [])[index]?.secondaryAttribute || [])
+            : (rule.condition?.[index] ? [rule.condition[index][1]] : []);
+
+        // 攻击类属性 type 5-10 必须匹配，基本属性 1-4 所有装备都有，跳过检查
+        if (expectedPrimary.some(t => t >= 5 && t <= 10) && !expectedPrimary.includes(attackType)) {
+            if (showResult) logger.info(`[装备] ${this.separationNames[index]} 新装备攻击属性 ${DBMgr.inst.getAttribute(attackType)} 不匹配期望的 ${expectedPrimary.filter(t => t >= 5 && t <= 10).map(t => DBMgr.inst.getAttribute(t)).join('/')}，跳过`);
+            return false;
+        }
+        // 抗性 type 11-16 必须匹配
+        if (expectedSecondary.length > 0 && !expectedSecondary.includes(defenseType)) {
+            if (showResult) logger.info(`[装备] ${this.separationNames[index]} 新装备抗性 ${DBMgr.inst.getAttribute(defenseType)} 不匹配期望的 ${expectedSecondary.map(t => DBMgr.inst.getAttribute(t)).join('/')}，跳过`);
+            return false;
+        }
+
         let betterAttributes = false;
         let existingAttributeList = null;
         let existingExist = true;
 
-        // 分身这个部位没装备 → 直接穿上
+        // 分身这个部位没装备 → 属性已匹配，直接穿上
         if (!this.equipmentData[index] || !this.equipmentData[index][equipmentType]) {
             betterAttributes = true;
             existingExist = false;
