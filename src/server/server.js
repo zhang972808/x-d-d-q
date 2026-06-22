@@ -340,7 +340,12 @@ async function start() {
     const runningAccounts = getRunningAccounts();
     if (runningAccounts.length > 0) {
       console.log(`发现 ${runningAccounts.length} 个运行中的账号，自动重启...`);
-      for (const acc of runningAccounts) {
+      for (let i = 0; i < runningAccounts.length; i++) {
+        const acc = runningAccounts[i];
+        if (i > 0) {
+          console.log(`  ⏳ 等待 12 秒后启动下一个...`);
+          await new Promise(r => setTimeout(r, 12000));
+        }
         try {
           await startGameAccount(acc);
           console.log(`  ✅ ${acc.nickname || acc.id} 已重启`);

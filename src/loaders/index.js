@@ -318,20 +318,35 @@ export default async () => {
       } catch (_) {}
     }, 10000);
 
-    // 自动连接游戏（有账号密码就自动登录）
+    // 自动连接游戏（有账号密码就自动登录，带重试）
     const account = global.account || {};
     if (account.serverId && account.username && account.password) {
       logger.info("[自动连接] 检测到账号信息，自动连接游戏...");
-      try {
-        const result = await GameNetMgr.inst.doLogin({
-          serverId: account.serverId,
-          username: account.username,
-          password: account.password,
-        });
-        GameNetMgr.inst.connectGameServer(result.wsAddress, result.playerId, result.token);
-        logger.info(`[自动连接] 登录成功，角色: ${result.nickName}`);
-      } catch (e) {
-        logger.warn(`[自动连接] 自动登录失败: ${e.message}，可通过 UI 手动登录`);
+      let loginSuccess = false;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const result = await GameNetMgr.inst.doLogin({
+            serverId: account.serverId,
+            username: account.username,
+            password: account.password,
+          });
+          GameNetMgr.inst.connectGameServer(result.wsAddress, result.playerId, result.token);
+          logger.info(`[自动连接] 登录成功，角色: ${result.nickName}`);
+          loginSuccess = true;
+          break;
+        } catch (e) {
+          const isRateLimit = e.message?.includes('频繁') || e.message?.includes('等待');
+          if (isRateLimit && attempt < 3) {
+            const wait = attempt * 15; // 15s, 30s
+            logger.warn(`[自动连接] 被限流，${wait}秒后重试 (${attempt}/3)...`);
+            await new Promise(r => setTimeout(r, wait * 1000));
+          } else {
+            logger.warn(`[自动连接] 自动登录失败: ${e.message}，可通过 UI 手动登录`);
+          }
+        }
+      }
+      if (!loginSuccess) {
+        logger.warn(`[自动连接] 3次重试后仍失败，可通过 UI 手动登录`);
       }
     }
 
