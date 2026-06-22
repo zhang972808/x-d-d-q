@@ -218,7 +218,6 @@ export default class PlayerAttributeMgr {
             this.unDealEquipmentDataMsg = t.undDealEquipmentDataMsg;
 
             const listResolve = [];
-            const listEquipVerify = []; // 穿了哪些装备，用于验证
 
             for (let i = 0; i < this.unDealEquipmentDataMsg.length; i++) {
                 const equipment = this.unDealEquipmentDataMsg[i];
@@ -238,8 +237,6 @@ export default class PlayerAttributeMgr {
                 // 用攻击属性匹配应该穿哪个分身（不猜 owner）
                 const matchedIdx = this.matchAvatarByAttributeType(attackType, defenseType);
 
-                const oldFightValues = { ...this.separationFightValue };
-
                 const processed = await this.processEquipment(
                     quality, level, attributeList, equipmentType, id, equipmentId, fightValue, matchedIdx
                 );
@@ -248,25 +245,7 @@ export default class PlayerAttributeMgr {
                     logger.info(`[装备] 分解 ${id} ${DBMgr.inst.getEquipmentQuality(quality)} ${equipmentName}`);
                     listResolve.push(id);
                 } else {
-                    listEquipVerify.push({ id, matchedIdx, oldFightValues });
                     await new Promise(resolve => setTimeout(resolve, 500));
-                }
-            }
-
-            // 穿完后刷新分身数据，验证装备落在正确分身上
-            if (listEquipVerify.length > 0) {
-                Attribute.FetchSeparation();
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-                for (const v of listEquipVerify) {
-                    const newFv = this.separationFightValue[v.matchedIdx] || 0;
-                    const oldFv = v.oldFightValues[v.matchedIdx] || 0;
-
-                    if (newFv === oldFv) {
-                        // 预期分身妖力没变，装备可能穿到其他分身了 → 分解新装备
-                        logger.warn(`[装备] 验证失败：${this.separationNames[v.matchedIdx]} 妖力未变化(${oldFv})，装备可能穿错分身，分解 id=${v.id}`);
-                        listResolve.push(v.id);
-                    }
                 }
             }
 
