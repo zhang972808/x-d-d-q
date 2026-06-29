@@ -3,7 +3,6 @@ import Protocol from "#game/net/Protocol.js";
 import logger from "#utils/logger.js";
 import LoopMgr from "#game/common/LoopMgr.js";
 import PlayerAttributeMgr from "./PlayerAttributeMgr.js";
-import WorkFlowMgr from "#game/common/WorkFlowMgr.js";
 
 export default class BagMgr {
     constructor() {
@@ -55,24 +54,22 @@ export default class BagMgr {
     }
 
     resumeChopIfNeeded() {
-        // 桃子有货且砍树开关开启且之前被停止了，恢复砍树任务
+        // 桃子有货且砍树开关开启且之前被停止了，重置标记让CD检查恢复砍树
         const peaches = this.getGoodsNum(100004);
         const stopNum = global.account.chopTree?.stop?.num ?? 50;
-        if (peaches > stopNum && !PlayerAttributeMgr.inst.chopEnabled && global.account.switch.chopTree) {
-            PlayerAttributeMgr.inst.chopEnabled = true;
+        if (peaches > stopNum && global.account.switch.chopTree) {
+            PlayerAttributeMgr.inst.goldenPeachDone = false;
             PlayerAttributeMgr.inst.initPeachNum = -1;
-            WorkFlowMgr.inst.add("ChopTree");
-            logger.info(`[背包管理] 桃子恢复到 ${peaches}，重新启用砍树`);
+            logger.info(`[背包管理] 桃子恢复到 ${peaches}，将在下个CD周期恢复砍树`);
         }
 
-        // 灵草有货且灵脉开关开启，恢复灵脉任务
+        // 灵草有货且灵脉开关开启，重置标记让CD检查恢复灵脉
         const flowers = this.getGoodsNum(100007);
         const flowerStopNum = global.account.talent?.stop?.stopNum ?? 300;
-        if (flowers > flowerStopNum && !PlayerAttributeMgr.inst.talentEnabled && global.account.switch.talent) {
-            PlayerAttributeMgr.inst.talentEnabled = true;
+        if (flowers > flowerStopNum && global.account.switch.talent) {
+            PlayerAttributeMgr.inst.talentFinished = false;
             PlayerAttributeMgr.inst.initFlowerNum = -1;
-            WorkFlowMgr.inst.add("Talent");
-            logger.info(`[背包管理] 灵草恢复到 ${flowers}，重新启用灵脉`);
+            logger.info(`[背包管理] 灵草恢复到 ${flowers}，将在下个CD周期恢复灵脉`);
         }
     }
 

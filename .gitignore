@@ -136,5 +136,6 @@ nodejs
 test*
 .vscode
 
-data
-account.json
+# data/ 账号配置文件保留纳入版本管理
+# data/ 中临时调试文件单独忽略见 data/.gitignore
+# account.json 纳入版本管理

@@ -11,6 +11,7 @@ export default class InvadeMgr {
         this.isProcessing = false;
         this.maxCount = 5;
         this.battleNum = 0;
+        this.finished = false;
     }
 
     static get inst() {
@@ -39,16 +40,30 @@ export default class InvadeMgr {
         }
     }
 
+    resetDaily() {
+        this.battleNum = 0;
+        this.finished = false;
+        logger.info(`[异兽入侵] 📅 每日重置`);
+    }
+
     completeTask() {
         logger.info(`[异兽入侵] 任务完成`);
         PlayerAttributeMgr.inst.switchToDefaultSeparation(); // 切换到默认分身
-        this.clear();
+        this.finished = true;
         WorkFlowMgr.inst.remove("Invade");
     }
 
     async loopUpdate() {
+        // 每日重置检测
+        const _nowBJ = new Date(new Date().getTime() + 8 * 3600000);
+        const today = _nowBJ.toISOString().slice(0, 10);
+        if (this._lastDay && this._lastDay !== today) {
+            this.resetDaily();
+        }
+        this._lastDay = today;
+
         const enabled = global.account.switch?.invade ?? false;
-        if (!WorkFlowMgr.inst.canExecute("Invade") || !enabled || this.isProcessing) return;
+        if (!WorkFlowMgr.inst.canExecute("Invade") || !enabled || this.isProcessing || this.finished) return;
 
         this.isProcessing = true;
         try {

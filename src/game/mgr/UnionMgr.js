@@ -191,7 +191,20 @@ export default class UnionMgr {
         }
     }
 
+    resetDaily() {
+        this.lastCheckTime = 0;
+        logger.info(`[妖盟管理] 📅 每日重置`);
+    }
+
     async loopUpdate() {
+        // 每日重置检测
+        const _nowBJ = new Date(new Date().getTime() + 8 * 3600000);
+        const today = _nowBJ.toISOString().slice(0, 10);
+        if (this._lastDay && this._lastDay !== today) {
+            this.resetDaily();
+        }
+        this._lastDay = today;
+
         if (this.isProcessing) return;
         if (!this.initialized) return;
         this.isProcessing = true;

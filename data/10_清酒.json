@@ -1,0 +1,157 @@
+{
+    "nickName": "🌌·清酒",
+    "loginToken": "",
+    "maxRetries": "10",
+    "reconnectInterval": 300000,
+    "startupDelay": 5000,
+    "serverId": "3119510",
+    "username": "18207385553",
+    "password": "9556231a",
+    "uid": "2831309867",
+    "token": "ZWE0MFBya2I0VlUxbVMyaHl2dnBua3ZUcWNQOWUvcDl1SUNZZkZ4N0JHVmVRVWhtVThrRWJhdG9mVXpkTlg5N1ZickIrRUVvakFyeEdXRThwZEU2NXluMDEvaUtJNm1SWFFRa2lxempkdytGa2dBMlROeWMwZlM2Tk1JbUJjUk9MbngvNmFwYkd0aHp5YnFMQVExWW5wa2x3QkxZTG44b2lFU1gxQTkvZmdOZ1JoZzE4NXpKdVZHL3pNeGhYeitmakxCODVGdXQyTCtZZW0ySlF2ZnNMNXpBN1IvVXNYRmlQd1lKRUZKUm9uamp3WTQ=",
+    "homeland": {
+        "ignoreTimeCheck": false
+    },
+    "unionBargainNum": 0,
+    "unionBargainPrice": -100,
+    "buyUnionGoodLists": [
+        230000011,
+        230000001,
+        230000002,
+        230000005,
+        230000006
+    ],
+    "rules": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "净瓶水"
+        }
+    ],
+    "rulesWeak": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 1,
+            "isCheck": true,
+            "description": "仙桃"
+        }
+    ],
+    "rulesStrong": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 4,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "净瓶水"
+        }
+    ],
+    "switch": {
+        "homeland": true,
+        "homelandGetReward": true,
+        "chopTree": true,
+        "talent": true,
+        "herorank": true,
+        "herorankFightDaily": true,
+        "challenge": 99999999999999,
+        "invade": true,
+        "invadeIndex": 0,
+        "starTrial": true,
+        "pupil": true,
+        "ticket": 0,
+        "defaultIndex": 0,
+        "challengeIndex": 0,
+        "activity": true,
+        "wildBoss": true,
+        "gatherEnergy": true,
+        "holyLand": true,
+        "townDemon": true,
+        "career": true,
+        "skywar": true,
+        "skywarIndex": 0,
+        "challengeSuccessReset": true,
+        "challengeWindowStart": 5,
+        "challengeWindowEnd": 8
+    },
+    "chopTree": {
+        "stop": {
+            "num": 4000,
+            "doNum": "infinity",
+            "level": "infinity"
+        },
+        "separation": {
+            "fightValueFirst": false,
+            "quality": 19,
+            "levelOffset": 5,
+            "probOffsetLowLv": 0,
+            "probOffset": 0,
+            "strictMode": true,
+            "condition": [
+                [
+                    7,
+                    15
+                ],
+                [
+                    5,
+                    12
+                ],
+                [
+                    9,
+                    11
+                ]
+            ],
+            "strictConditions": [
+                {
+                    "primaryAttribute": [
+                        7
+                    ],
+                    "secondaryAttribute": [
+                        15
+                    ]
+                },
+                {
+                    "primaryAttribute": [
+                        5
+                    ],
+                    "secondaryAttribute": [
+                        12
+                    ]
+                },
+                {
+                    "primaryAttribute": [
+                        9
+                    ],
+                    "secondaryAttribute": [
+                        11
+                    ]
+                }
+            ]
+        },
+        "showResult": true,
+        "chopMode": "strict"
+    },
+    "talent": {
+        "separation": {
+            "quality": 5
+        },
+        "showResult": true
+    },
+    "holyLand": {
+        "maxJadeCost": 0
+    },
+    "wishPetPool": [
+        114001,
+        114007
+    ]
+}

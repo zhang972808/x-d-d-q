@@ -27,6 +27,7 @@ export default class SkyWarMgr {
         this.enemyData = [];
         // 是否同步数据
         this.initialized = false;
+        this.finished = false;
 
         RegistMgr.inst.add(this);
     }
@@ -81,7 +82,8 @@ export default class SkyWarMgr {
 
             if (this.enemyData.length == 0) {
                 logger.info(`[征战诸天] 征战诸天数据同步为空，可能未取得资格`);
-                this.clear();
+                this.finished = true;
+                WorkFlowMgr.inst.remove("SkyWar");
             }
 
             this.initialized = true;
@@ -101,10 +103,20 @@ export default class SkyWarMgr {
         }
     }
 
+    resetDaily() {
+        this.fightNums = 0;
+        this.battleTimes = this.maxFightNum;
+        this.initialized = false;
+        this.finished = false;
+        this.worship = false;
+        logger.info(`[征战诸天] 📅 每日重置`);
+    }
+
     completeTask() {
         logger.info(`[征战诸天] 任务完成`);
         PlayerAttributeMgr.inst.switchToDefaultSeparation(); // 切换到默认分身
-        this.clear();
+        this.finished = true;
+        WorkFlowMgr.inst.remove("SkyWar");
 
         // 自动领取征战诸天任务奖励
         if (this.battleTimes == 0) {
@@ -190,8 +202,16 @@ export default class SkyWarMgr {
     }
 
     async loopUpdate() {
+        // 每日重置检测
+        const _nowBJ = new Date(new Date().getTime() + 8 * 3600000);
+        const today = _nowBJ.toISOString().slice(0, 10);
+        if (this._lastDay && this._lastDay !== today) {
+            this.resetDaily();
+        }
+        this._lastDay = today;
+
         const enabled = global.account.switch?.skywar ?? false;
-        if (!WorkFlowMgr.inst.canExecute("SkyWar") || !enabled || this.isProcessing) return;
+        if (!WorkFlowMgr.inst.canExecute("SkyWar") || !enabled || this.isProcessing || this.finished) return;
 
         this.isProcessing = true;
         try {

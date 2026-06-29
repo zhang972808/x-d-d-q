@@ -1,0 +1,174 @@
+{
+    "nickName": "🌌·开心",
+    "loginToken": "777",
+    "maxRetries": "infinity",
+    "reconnectInterval": 300000,
+    "startupDelay": 5000,
+    "serverId": "3119512",
+    "username": "3503492298",
+    "password": "123456789zz",
+    "uid": "2944806456",
+    "token": "NDkwZEpISnpodmJoQ1NpT2NYdVBwbTVvbjBvMUxoZk16RjJOMGF6S1ZVM2F6R2ZJbS80eUdDL1ZSSUg5S094TzJDNHNYT2ZSNUFWV1AvSGdqQTZNNlFPcmEyUzN1VUt1Qk5pQTEvc0dKK241YW11cURXaFRPZ0JJWTQ4MnVjaHhORnFhUkxrVDBSOGgxN2hGK2JTSWNpWHROcUh3dmRhUGJldkRYeTdLanlpUlBkM3IxZVBxYVNyaXEzNHlBZGJmQ2NlOUp2TklzaDY1VVYyVWQxaldLT3luNGd3R0pFUitleGt5ZEEyZmE4ekFaWjQ=",
+    "unionBargainNum": 3,
+    "unionBargainPrice": 1,
+    "buyUnionGoodLists": [
+        230000011,
+        230000001,
+        230000002
+    ],
+    "rules": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 4,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 2,
+            "isCheck": false,
+            "description": "净瓶水"
+        },
+        {
+            "ItemId": 100029,
+            "minItemLv": 5,
+            "isCheck": false,
+            "description": "琉璃珠"
+        }
+    ],
+    "rulesWeak": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 5,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 4,
+            "isCheck": true,
+            "description": "净瓶水"
+        },
+        {
+            "ItemId": 100044,
+            "minItemLv": 5,
+            "isCheck": true,
+            "description": "天衍令"
+        }
+    ],
+    "rulesStrong": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 5,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "净瓶水"
+        }
+    ],
+    "switch": {
+        "homeland": true,
+        "homelandGetReward": true,
+        "chopTree": true,
+        "talent": false,
+        "herorank": true,
+        "herorankFightDaily": false,
+        "challenge": 0,
+        "invade": true,
+        "invadeIndex": 0,
+        "starTrial": true,
+        "pupil": true,
+        "ticket": 1,
+        "defaultIndex": 0,
+        "challengeIndex": 2,
+        "activity": true,
+        "wildBoss": true,
+        "gatherEnergy": true,
+        "holyLand": false,
+        "career": false
+    },
+    "chopTree": {
+        "stop": {
+            "num": 40000,
+            "doNum": "200",
+            "level": "infinity"
+        },
+        "showResult": true,
+        "separation": {
+            "fightValueFirst": true,
+            "quality": 1,
+            "levelOffset": 5,
+            "probOffsetLowLv": 0.3,
+            "probOffset": 0.2,
+            "strictMode": true,
+            "condition": [
+                [
+                    6,
+                    12
+                ],
+                [
+                    6,
+                    11
+                ],
+                [
+                    8,
+                    12
+                ]
+            ],
+            "strictConditions": [
+                {
+                    "primaryAttribute": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16
+                    ],
+                    "secondaryAttribute": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16
+                    ]
+                }
+            ]
+        }
+    },
+    "talent": {
+        "stop": {
+            "stopNum": 1,
+            "doNum": "infinity"
+        },
+        "showResult": true,
+        "separation": {
+            "quality": 5
+        }
+    }
+}

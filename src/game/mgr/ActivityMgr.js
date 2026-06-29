@@ -247,11 +247,28 @@ export default class ActivityMgr {
         this.isProcessing = false;
     }
 
+    resetDaily() {
+        this.actCommonDataMap = {};
+        this.actDetailConfigMap = {};
+        this.actConditionDataMap = {};
+        this.actMallBuyCountDataMap = {};
+        this.lastLoopCheckTime = 0;
+        logger.info(`[活动管理] 📅 每日重置，活动数据缓存已清空`);
+    }
+
     async loopUpdate() {
         if (this.isProcessing) return;
         this.isProcessing = true;
 
         try {
+            // 每日重置检测
+            const _nowBJ = new Date(new Date().getTime() + 8 * 3600000);
+            const today = _nowBJ.toISOString().slice(0, 10);
+            if (this._lastDay && this._lastDay !== today) {
+                this.resetDaily();
+            }
+            this._lastDay = today;
+
             const enable = global.account.switch.activity ?? false;
             if (!enable) {
                 this.clear();

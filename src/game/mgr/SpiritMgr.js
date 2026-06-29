@@ -9,6 +9,7 @@ export default class SpiritMgr {
         this.AD_REWARD_DAILY_MAX_NUM = 2;   // 每日最大领取次数
         this.AD_REWARD_CD = 1000;           // 每次间隔时间
         this.isProcessing = false;
+        this.finished = false;
     }
 
     static get inst() {
@@ -48,13 +49,27 @@ export default class SpiritMgr {
         }
     }
 
+    resetDaily() {
+        this.getAdRewardTimes = 0;
+        this.finished = false;
+        logger.info(`[精怪管理] 📅 每日重置`);
+    }
+
     async loopUpdate() {
+        // 每日重置检测
+        const _nowBJ = new Date(new Date().getTime() + 8 * 3600000);
+        const today = _nowBJ.toISOString().slice(0, 10);
+        if (this._lastDay && this._lastDay !== today) {
+            this.resetDaily();
+        }
+        this._lastDay = today;
+
         if (this.isProcessing) return;
         this.isProcessing = true;
 
         try {
             if (this.getAdRewardTimes >= this.AD_REWARD_DAILY_MAX_NUM) {
-                this.clear();
+                this.finished = true;
                 logger.info("[精怪管理] 达到每日最大领取次数，停止奖励领取");
             } else {
                 this.processReward();

@@ -178,7 +178,21 @@ export default class CareerMgr {
 
   // ==================== 核心逻辑 ====================
 
+  resetDaily() {
+    this._queriedBeforeFight = false;
+    this.lastTaskRewardTime = 0;
+    logger.info(`[道途管理] 📅 每日重置`);
+  }
+
   async loopUpdate() {
+    // 每日重置检测
+    const _nowBJ = new Date(new Date().getTime() + 8 * 3600000);
+    const today = _nowBJ.toISOString().slice(0, 10);
+    if (this._lastDay && this._lastDay !== today) {
+      this.resetDaily();
+    }
+    this._lastDay = today;
+
     if (this.isProcessing) return;
     this.isProcessing = true;
 

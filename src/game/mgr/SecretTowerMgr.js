@@ -14,6 +14,7 @@ export default class SecretTowerMgr {
         this.challenge = global.account.switch.challenge || 0;
         this.showResult = global.account.switch.showResult || false;
         this.challengeSuccessReset = global.account.switch.challengeSuccessReset || false;
+        this.finished = false;
 
         // LoopMgr.inst.add(this);
         RegistMgr.inst.add(this);
@@ -42,7 +43,8 @@ export default class SecretTowerMgr {
     // 每日重置挑战次数
     resetDaily() {
         this.challenge = global.account.switch.challenge || 0;
-        logger.info(`[六道秘境] 每日挑战次数重置为 ${this.challenge}`);
+        this.finished = false;
+        logger.info(`[六道秘境] 📅 每日挑战次数重置为 ${this.challenge}`);
     }
 
     SyncData(t) {
@@ -72,12 +74,12 @@ export default class SecretTowerMgr {
         this._lastDay = today;
 
         if (!WorkFlowMgr.inst.canExecute("Challenge")) return;
-        if (this.isProcessing || this.isSyncing) return;
+        if (this.isProcessing || this.isSyncing || this.finished) return;
         this.isProcessing = true;
 
         try {
             if (this.challenge == 0) {
-                this.clear();
+                this.finished = true;
                 logger.info("[六道秘境] 任务完成停止循环");
                 // 任务完成后切换为默认分身
                 PlayerAttributeMgr.inst.switchToDefaultSeparation();

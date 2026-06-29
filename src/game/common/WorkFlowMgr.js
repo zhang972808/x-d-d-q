@@ -8,8 +8,6 @@ export default class WorkFlowMgr {
 
         this.priorityDict = {
             "Challenge": 0,      // 最高优先级 - 每天6-8点推图/镇妖塔/真火
-            "ChopTree": 1,       // 1级项目
-            "Talent": 2,         // 2级项目
             "Invade": 3,         // 3级项目 异兽入侵
             "SkyWar": 5,         // 5级项目 征战诸天
         };
@@ -42,18 +40,6 @@ export default class WorkFlowMgr {
     }
 
     start() {
-        // 添加1级项目
-        const ChopTree = global.account.switch.chopTree || false;
-        if (ChopTree) {
-            logger.info("[顺序管理] 已开启砍树");
-            this.add("ChopTree");
-        }
-        // 添加2级项目
-        const Talent = global.account.switch.talent || false;
-        if (Talent) {
-            logger.info("[顺序管理] 已开启砍灵脉");
-            this.add("Talent");
-        }
         // 添加3级项目
         const Invade = global.account.switch.invade || false;
         if (Invade) {

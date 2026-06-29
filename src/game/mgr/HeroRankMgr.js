@@ -16,6 +16,7 @@ export default class HeroRankMgr {
         this.energy = 0;
         this.rank = null;
         this.opponentIndex = 0;   // 当前打列表第几个（0=第一个）
+        this.finished = false;
     }
 
     static get inst() {
@@ -77,7 +78,7 @@ export default class HeroRankMgr {
             const player = this.getPlayerByIndex(t, this.opponentIndex);
             if (!player) {
                 logger.info("[群英榜管理] 对手列表已打完，停止");
-                this.clear();
+                this.finished = true;
                 return;
             }
 
@@ -128,12 +129,29 @@ export default class HeroRankMgr {
         }
     }
 
+    resetDaily() {
+        this.energy = 0;
+        this.opponentIndex = 0;
+        this.buyNumDaily = 0;
+        this.finished = false;
+        logger.info(`[群英榜管理] 📅 每日重置`);
+    }
+
     async loopUpdate() {
+        // 每日重置检测
+        const _nowBJ = new Date(new Date().getTime() + 8 * 3600000);
+        const today = _nowBJ.toISOString().slice(0, 10);
+        if (this._lastDay && this._lastDay !== today) {
+            this.resetDaily();
+        }
+        this._lastDay = today;
+
         if (this.isProcessing) return;
         if (!(global.account.switch?.herorank ?? false)) return;
+        if (this.finished) return;
         if (this.energy < 1) {
             logger.info("[群英榜管理] 体力不足，停止");
-            this.clear();
+            this.finished = true;
             return;
         }
 

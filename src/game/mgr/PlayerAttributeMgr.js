@@ -6,7 +6,6 @@ import DBMgr from "#game/common/DBMgr.js";
 import BagMgr from "#game/mgr/BagMgr.js";
 import AdRewardMgr from "#game/mgr/AdRewardMgr.js";
 import UnionMgr from "#game/mgr/UnionMgr.js";
-import WorkFlowMgr from "#game/common/WorkFlowMgr.js";
 
 // 主属性 → 神兽灵脉 skillId 映射
 const PRIMARY_ATTR_TO_BEAST_SKILL = {
@@ -124,6 +123,10 @@ export default class PlayerAttributeMgr {
         // 🔒储存状态防止出现问题
         this.isProcessing = false;
         this.chopSeparationIdx = null;  // 砍树时分身归属（防止匹配错误穿错分身）
+
+        this.CHOP_TALENT_CD = 30 * 60 * 1000;       // 砍树灵脉检查CD(30分钟)
+        this.lastChopTalentTime = 0;                 // 上次砍树灵脉检查时间
+        this.goldenPeachDone = false;                 // 金色桃是否已执行(防重复)
     }
 
     static isMonthCardVip = false;  // 月卡
@@ -413,15 +416,16 @@ export default class PlayerAttributeMgr {
             ((typeof global.account.chopTree?.stop?.doNum === 'string' && global.account.chopTree.stop.doNum.toLowerCase() === 'infinity') ? Infinity : (global.account.chopTree?.stop?.doNum || Infinity));
 
         if (peachNum <= stopNum || (isFinite(stopLevel) && PlayerAttributeMgr.level <= stopLevel) || hasDoNum >= doNum) {
-            logger.warn(`[砍树] 停止任务, 还剩余 ${peachNum} 桃子`);
-            this.chopEnabled = false;
-            this.switchToDefaultSeparation();
-            WorkFlowMgr.inst.remove("ChopTree");
-            logger.info("[砍树] 金色桃 5轮x20次");
-            for (var r = 0; r < 5; r++) {
-              for (var i = 0; i < 20; i++) {
-                GameNetMgr.inst.sendPbMsg(Protocol.S_GOLD_PEACH_CUT_TREE, {});
-              }
+            if (!this.goldenPeachDone) {
+                logger.warn(`[砍树] 停止任务, 还剩余 ${peachNum} 桃子`);
+                this.switchToDefaultSeparation();
+                logger.info("[砍树] 金色桃 5轮x20次");
+                for (var r = 0; r < 5; r++) {
+                  for (var i = 0; i < 20; i++) {
+                    GameNetMgr.inst.sendPbMsg(Protocol.S_GOLD_PEACH_CUT_TREE, {});
+                  }
+                }
+                this.goldenPeachDone = true;
             }
             return;
         }
@@ -434,10 +438,8 @@ export default class PlayerAttributeMgr {
         // 记录砍树时的分身 —— 装备掉落默认归属这个分身，不需要用属性值猜
         this.chopSeparationIdx = this.useSeparationIdx;
 
-        // 直接砍树，不需要切换分身
-        // 服务器返回的装备数据里自带分身的 playerAttributeDataList 和 fightValue
+        // 只砍不换装备
         Attribute.Chop(this.chopTimes);
-        Attribute.CheckUnfinishedEquipment();
 
         // 妖盟任务
         if (UnionMgr.inst.inUnion && !this.doneUnionTask && hasDoNum >= 350) {
@@ -675,10 +677,11 @@ export default class PlayerAttributeMgr {
 
         // 有花就用，花没了就停
         if (flowerNum <= 0) {
-            logger.warn(`[灵脉] 无先天灵草，停止任务`);
-            this.talentEnabled = false;
-            this.switchToDefaultSeparation();
-            WorkFlowMgr.inst.remove("Talent");
+            if (!this.talentFinished) {
+                logger.warn(`[灵脉] 无先天灵草，停止任务`);
+                this.switchToDefaultSeparation();
+                this.talentFinished = true;
+            }
             return;
         }
 
@@ -824,29 +827,21 @@ export default class PlayerAttributeMgr {
 
             // 分身不存在跳过后续任务
             if (!this.separation) {
-                logger.info(`[获取分身] 未找到分身，跳过砍树和灵脉任务`);
-                WorkFlowMgr.inst.remove("ChopTree");
-                WorkFlowMgr.inst.remove("Talent");
                 return;
             }
 
-            // 自动砍树逻辑
-            if (WorkFlowMgr.inst.canExecute("ChopTree")) {
+            const now = Date.now();
+            if (now - this.lastChopTalentTime >= this.CHOP_TALENT_CD) {
+                this.lastChopTalentTime = now;
+
+                // 自动砍树逻辑
                 if (global.account.switch?.chopTree ?? false) {
                     this.doChopTree();
-                } else {
-                    WorkFlowMgr.inst.remove("ChopTree");
-                    logger.warn(`[砍树] 未执行`);
                 }
-            }
 
-            // 自动砍灵脉逻辑
-            if (WorkFlowMgr.inst.canExecute("Talent")) {
+                // 自动砍灵脉逻辑
                 if (global.account.switch?.talent ?? false) {
                     this.doAutoTalent();
-                } else {
-                    WorkFlowMgr.inst.remove("Talent");
-                    logger.warn(`[灵脉] 未执行`);
                 }
             }
         } catch (error) {

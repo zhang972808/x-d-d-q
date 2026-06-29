@@ -1,0 +1,171 @@
+{
+    "loginToken": "777",
+    "maxRetries": "infinity",
+    "reconnectInterval": 300000,
+    "startupDelay": 5000,
+    "unionBargainNum": 3,
+    "unionBargainPrice": 1,
+    "buyUnionGoodLists": [
+        230000011,
+        230000001,
+        230000002
+    ],
+    "rules": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 4,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 2,
+            "isCheck": false,
+            "description": "净瓶水"
+        },
+        {
+            "ItemId": 100029,
+            "minItemLv": 5,
+            "isCheck": false,
+            "description": "琉璃珠"
+        }
+    ],
+    "rulesWeak": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 5,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 4,
+            "isCheck": true,
+            "description": "净瓶水"
+        },
+        {
+            "ItemId": 100044,
+            "minItemLv": 5,
+            "isCheck": true,
+            "description": "天衍令"
+        }
+    ],
+    "rulesStrong": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 5,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "净瓶水"
+        }
+    ],
+    "switch": {
+        "homeland": true,
+        "homelandGetReward": true,
+        "chopTree": true,
+        "talent": false,
+        "herorank": true,
+        "herorankFightDaily": false,
+        "challenge": 0,
+        "invade": true,
+        "invadeIndex": 0,
+        "starTrial": true,
+        "pupil": true,
+        "ticket": 1,
+        "defaultIndex": 0,
+        "challengeIndex": 2,
+        "activity": true,
+        "wildBoss": true,
+        "gatherEnergy": true,
+        "holyLand": false,
+        "career": true
+    },
+    "chopTree": {
+        "stop": {
+            "num": 40000,
+            "doNum": "200",
+            "level": "infinity"
+        },
+        "showResult": true,
+        "separation": {
+            "fightValueFirst": true,
+            "quality": 1,
+            "levelOffset": 5,
+            "probOffsetLowLv": 0.3,
+            "probOffset": 0.2,
+            "strictMode": true,
+            "condition": [
+                [
+                    6,
+                    12
+                ],
+                [
+                    6,
+                    11
+                ],
+                [
+                    8,
+                    12
+                ]
+            ],
+            "strictConditions": [
+                {
+                    "primaryAttribute": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16
+                    ],
+                    "secondaryAttribute": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16
+                    ]
+                }
+            ]
+        },
+        "chopMode": "strict"
+    },
+    "talent": {
+        "separation": {
+            "quality": 5
+        },
+        "showResult": true
+    },
+    "serverId": "3119512",
+    "username": "3503492298",
+    "password": "123456789zz",
+    "nickName": "🌌·开心",
+    "uid": "2944806456",
+    "token": "MjUyMjZHYzBacUFDRVcrUktUTnVNUnpKcXBKaTdpVXFhb1o5ZVN3TWdTd3V2eEUvNHBOenpRbVI1cjhaNWhuSlRvVllHOE5keDNXYk9CSWJ3RUpXd3U0b0Z6czllOHh3RnBLN1FrMThqUHhlcCtuQTZDZDVKc1luaHlnQlRTN1VFckVLVzEySVREZnVrMVdBazJoTmlIREhTVlB3N2twR1phOHJSeEZXQ0xDaXhkdjlsejZKdUdMWDVZRFNQTENFNThFT0s5U2NlckNvd1hzQ05iZDdrQmJ5STVYK0dGcHp3WG1HU0dYZkNSNFE2eTA="
+}

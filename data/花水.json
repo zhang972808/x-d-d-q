@@ -1,0 +1,229 @@
+{
+    "loginToken": "777",
+    "maxRetries": "infinity",
+    "reconnectInterval": 300000,
+    "startupDelay": 5000,
+    "unionBargainNum": 3,
+    "unionBargainPrice": 1,
+    "buyUnionGoodLists": [
+        230000011,
+        230000001,
+        230000002,
+        230000005,
+        230000006
+    ],
+    "homeland": {
+        "ignoreTimeCheck": false
+    },
+    "rules": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "净瓶水"
+        },
+        {
+            "ItemId": 100029,
+            "minItemLv": 1,
+            "isCheck": false,
+            "description": "琉璃珠"
+        }
+    ],
+    "rulesWeak": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 5,
+            "isCheck": false,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 4,
+            "isCheck": false,
+            "description": "净瓶水"
+        },
+        {
+            "ItemId": 100044,
+            "minItemLv": 5,
+            "isCheck": false,
+            "description": "天衍令"
+        }
+    ],
+    "rulesStrong": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 4,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "净瓶水"
+        }
+    ],
+    "switch": {
+        "homeland": true,
+        "homelandGetReward": true,
+        "chopTree": true,
+        "talent": true,
+        "herorank": true,
+        "herorankFightDaily": false,
+        "challenge": 999,
+        "invade": true,
+        "invadeIndex": 0,
+        "starTrial": true,
+        "pupil": true,
+        "ticket": 1,
+        "defaultIndex": 1,
+        "challengeIndex": 2,
+        "activity": true,
+        "wildBoss": true,
+        "gatherEnergy": true,
+        "syncMode": true,
+        "followLeader": true,
+        "followLeaderOnly": true,
+        "holyLand": true,
+        "townDemon": true,
+        "tribulation": true,
+        "career": true
+    },
+    "chopTree": {
+        "stop": {
+            "num": 0,
+            "doNum": "99999",
+            "level": "infinity"
+        },
+        "showResult": true,
+        "separation": {
+            "fightValueFirst": true,
+            "quality": 1,
+            "levelOffset": 5,
+            "probOffsetLowLv": 0,
+            "probOffset": 0,
+            "strictMode": true,
+            "condition": [
+                [
+                    7,
+                    14
+                ],
+                [
+                    8,
+                    12
+                ],
+                [
+                    9,
+                    11
+                ]
+            ],
+            "strictConditions": [
+                {
+                    "primaryAttribute": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
+                    "secondaryAttribute": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16
+                    ]
+                },
+                {
+                    "primaryAttribute": [
+                        6,
+                        7,
+                        8,
+                        9,
+                        10
+                    ],
+                    "secondaryAttribute": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16
+                    ]
+                },
+                {
+                    "primaryAttribute": [
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16
+                    ],
+                    "secondaryAttribute": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16
+                    ]
+                }
+            ]
+        }
+    },
+    "talent": {
+        "stop": {
+            "stopNum": 300,
+            "doNum": "infinity"
+        },
+        "showResult": true,
+        "separation": {
+            "quality": 5
+        }
+    },
+    "tribulation": {},
+    "serverId": "3119512",
+    "username": "tgzhg5947946",
+    "password": "",
+    "nickName": "云涧🦌田赫",
+    "uid": "2397242453",
+    "token": "MDRkMEo2RXZLQk45enpybFFvT0tNSXAzWGhnNHdXUUtOWU9mRTg0Q2JqK2I3U0F2WVZkU21ESStNTHlpZ2E4a2dUdlpiN2JOL2o4cHFWb3FHdThoc3JKaU1iVUFlZmpBbEtMTGhpMk5va0lMMWlzeG42cXhvbytGaDdmeG92dEtGektndHZoeVdIcVgzQ0VjT1pvUmY5R1ZqeEJXTjlUbXU0WnRXcnA3WERaaVplNWpFYmpiWFpxQ1BMVWEyQ1VodXh0MlJEZTNTYkpFSnZ1Mi9lcDk1b2pVVHRzVjFwMzh3b3kzS0Y4bmx2Q3JqU3c="
+}

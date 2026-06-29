@@ -1,0 +1,128 @@
+{
+    "nickName": "专治各种不服",
+    "loginToken": "",
+    "maxRetries": "10",
+    "reconnectInterval": 1800000,
+    "startupDelay": 5000,
+    "serverId": "3119512",
+    "username": "15339321054",
+    "password": "xundaodaqian123456",
+    "uid": "2716066473",
+    "token": "MDIwMjF0UjBacnZzSEkzM3ZVVVVRbU1ZSVAyK0dncEdvSXdiMVoxeElKSjNxSkF6NG1YSEpzVU9jQWxPWVAvMGxBMXNFbnhPN3BLM29neEQ3VVFIQTFIMmdMKzV3cU1MYlQ3aENQOXgzK0NzdE4xRkpJVWR0OUQvaHo3Q3lMeWp4bm9zblk5YU5keUcxWjVsZG1PVW1MOEV3bU5veGRvMGxQdzRzanVBdkxiRmZnQmdwSjN4U2J1L2dHSWxvYXRrWW11bkgrNXp6TTk3eVZ3cklCbFhhQkdjaHRFQUFCZUlpd3dYSko4aFNHNWQwOEE=",
+    "homeland": {
+        "ignoreTimeCheck": false
+    },
+    "unionBargainNum": 0,
+    "unionBargainPrice": 100,
+    "buyUnionGoodLists": [
+        230000011,
+        230000001,
+        230000002,
+        230000005,
+        230000006
+    ],
+    "rules": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "净瓶水"
+        }
+    ],
+    "rulesWeak": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 1,
+            "isCheck": true,
+            "description": "仙桃"
+        }
+    ],
+    "rulesStrong": [
+        {
+            "ItemId": 100004,
+            "minItemLv": 4,
+            "isCheck": true,
+            "description": "仙桃"
+        },
+        {
+            "ItemId": 100025,
+            "minItemLv": 3,
+            "isCheck": true,
+            "description": "净瓶水"
+        }
+    ],
+    "switch": {
+        "homeland": true,
+        "homelandGetReward": true,
+        "chopTree": false,
+        "talent": false,
+        "herorank": false,
+        "herorankFightDaily": false,
+        "challenge": 999,
+        "invade": false,
+        "invadeIndex": 0,
+        "starTrial": true,
+        "pupil": true,
+        "ticket": 0,
+        "defaultIndex": 0,
+        "challengeIndex": 1,
+        "activity": true,
+        "wildBoss": true,
+        "gatherEnergy": true,
+        "holyLand": false,
+        "townDemon": false,
+        "career": true,
+        "skywar": true,
+        "skywarIndex": 0,
+        "challengeSuccessReset": true,
+        "challengeWindowStart": 5,
+        "challengeWindowEnd": 8
+    },
+    "chopTree": {
+        "stop": {
+            "num": 40000,
+            "doNum": "infinity",
+            "level": "infinity"
+        },
+        "separation": {
+            "fightValueFirst": false,
+            "quality": 1,
+            "levelOffset": 5,
+            "probOffsetLowLv": 0,
+            "probOffset": 0,
+            "strictMode": false,
+            "condition": [
+                [
+                    1,
+                    11
+                ],
+                [
+                    1,
+                    11
+                ],
+                [
+                    1,
+                    11
+                ]
+            ]
+        },
+        "showResult": false,
+        "chopMode": "strict"
+    },
+    "talent": {
+        "separation": {
+            "quality": 5
+        },
+        "showResult": true
+    },
+    "holyLand": {
+        "maxJadeCost": 0
+    },
+    "wishPetPool": []
+}
